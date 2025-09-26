@@ -1,0 +1,575 @@
+--- Nueva solicitud: 2025-05-19 09:47:32 ---
+GET: Array
+(
+    [id] => 4
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_preparacion"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 4
+Input decodificado: Array
+(
+    [estado] => en_preparacion
+)
+
+Nuevo estado: en_preparacion
+Estado actual: pendiente
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":4,"nuevo_estado":"en_preparacion","estado_anterior":"pendiente"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-19 09:47:38 ---
+GET: Array
+(
+    [id] => 4
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"listo"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 4
+Input decodificado: Array
+(
+    [estado] => listo
+)
+
+Nuevo estado: listo
+Estado actual: en_preparacion
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":4,"nuevo_estado":"listo","estado_anterior":"en_preparacion"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-19 09:47:44 ---
+GET: Array
+(
+    [id] => 3
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"listo"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 3
+Input decodificado: Array
+(
+    [estado] => listo
+)
+
+Nuevo estado: listo
+Estado actual: pendiente
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":3,"nuevo_estado":"listo","estado_anterior":"pendiente"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-19 09:47:47 ---
+GET: Array
+(
+    [id] => 2
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"listo"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 2
+Input decodificado: Array
+(
+    [estado] => listo
+)
+
+Nuevo estado: listo
+Estado actual: en entrega
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":2,"nuevo_estado":"listo","estado_anterior":"en entrega"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-19 09:52:01 ---
+GET: Array
+(
+    [id] => 8
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_preparacion"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 8
+Input decodificado: Array
+(
+    [estado] => en_preparacion
+)
+
+Nuevo estado: en_preparacion
+Estado actual: pendiente
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":8,"nuevo_estado":"en_preparacion","estado_anterior":"pendiente"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-19 09:52:19 ---
+GET: Array
+(
+    [id] => 8
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"listo"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 8
+Input decodificado: Array
+(
+    [estado] => listo
+)
+
+Nuevo estado: listo
+Estado actual: en_preparacion
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":8,"nuevo_estado":"listo","estado_anterior":"en_preparacion"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-19 09:54:47 ---
+GET: Array
+(
+    [id] => 9
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_preparacion"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 9
+Input decodificado: Array
+(
+    [estado] => en_preparacion
+)
+
+Nuevo estado: en_preparacion
+Estado actual: pendiente
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":9,"nuevo_estado":"en_preparacion","estado_anterior":"pendiente"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-19 09:55:02 ---
+GET: Array
+(
+    [id] => 9
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"listo"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 9
+Input decodificado: Array
+(
+    [estado] => listo
+)
+
+Nuevo estado: listo
+Estado actual: en_preparacion
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":9,"nuevo_estado":"listo","estado_anterior":"en_preparacion"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:38:04 ---
+GET: Array
+(
+    [id] => 7
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_preparacion"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 7
+Input decodificado: Array
+(
+    [estado] => en_preparacion
+)
+
+Nuevo estado: en_preparacion
+Estado actual: pendiente
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":7,"nuevo_estado":"en_preparacion","estado_anterior":"pendiente"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:47:49 ---
+GET: Array
+(
+    [id] => 7
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"listo"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 7
+Input decodificado: Array
+(
+    [estado] => listo
+)
+
+Nuevo estado: listo
+Estado actual: en_preparacion
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":7,"nuevo_estado":"listo","estado_anterior":"en_preparacion"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:49:46 ---
+GET: Array
+(
+    [id] => 9
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_entrega"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 9
+Input decodificado: Array
+(
+    [estado] => en_entrega
+)
+
+Nuevo estado: en_entrega
+Estado actual: listo
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":9,"nuevo_estado":"en_entrega","estado_anterior":"listo"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:50:15 ---
+GET: Array
+(
+    [id] => 7
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_entrega"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 7
+Input decodificado: Array
+(
+    [estado] => en_entrega
+)
+
+Nuevo estado: en_entrega
+Estado actual: listo
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":7,"nuevo_estado":"en_entrega","estado_anterior":"listo"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:50:21 ---
+GET: Array
+(
+    [id] => 3
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_entrega"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 3
+Input decodificado: Array
+(
+    [estado] => en_entrega
+)
+
+Nuevo estado: en_entrega
+Estado actual: listo
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":3,"nuevo_estado":"en_entrega","estado_anterior":"listo"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:50:24 ---
+GET: Array
+(
+    [id] => 4
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_entrega"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 4
+Input decodificado: Array
+(
+    [estado] => en_entrega
+)
+
+Nuevo estado: en_entrega
+Estado actual: listo
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":4,"nuevo_estado":"en_entrega","estado_anterior":"listo"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:55:02 ---
+GET: Array
+(
+    [id] => 10
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"listo"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 10
+Input decodificado: Array
+(
+    [estado] => listo
+)
+
+Nuevo estado: listo
+Estado actual: pendiente
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":10,"nuevo_estado":"listo","estado_anterior":"pendiente"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:55:46 ---
+GET: Array
+(
+    [id] => 10
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_entrega"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 10
+Input decodificado: Array
+(
+    [estado] => en_entrega
+)
+
+Nuevo estado: en_entrega
+Estado actual: listo
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":10,"nuevo_estado":"en_entrega","estado_anterior":"listo"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:55:55 ---
+GET: Array
+(
+    [id] => 8
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_entrega"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 8
+Input decodificado: Array
+(
+    [estado] => en_entrega
+)
+
+Nuevo estado: en_entrega
+Estado actual: listo
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":8,"nuevo_estado":"en_entrega","estado_anterior":"listo"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:57:02 ---
+GET: Array
+(
+    [id] => 5
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_entrega"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 5
+Input decodificado: Array
+(
+    [estado] => en_entrega
+)
+
+Nuevo estado: en_entrega
+Estado actual: listo
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":5,"nuevo_estado":"en_entrega","estado_anterior":"listo"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:57:35 ---
+GET: Array
+(
+    [id] => 10
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"entregado"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 10
+Input decodificado: Array
+(
+    [estado] => entregado
+)
+
+Nuevo estado: entregado
+Estado actual: en_entrega
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":10,"nuevo_estado":"entregado","estado_anterior":"en_entrega"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:59:46 ---
+GET: Array
+(
+    [id] => 11
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_preparacion"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 11
+Input decodificado: Array
+(
+    [estado] => en_preparacion
+)
+
+Nuevo estado: en_preparacion
+Estado actual: pendiente
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":11,"nuevo_estado":"en_preparacion","estado_anterior":"pendiente"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 00:59:54 ---
+GET: Array
+(
+    [id] => 11
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"listo"}
+Archivos incluidos correctamente
+Usuario autenticado: cocinero
+ID de pedido: 11
+Input decodificado: Array
+(
+    [estado] => listo
+)
+
+Nuevo estado: listo
+Estado actual: en_preparacion
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":11,"nuevo_estado":"listo","estado_anterior":"en_preparacion"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 01:00:26 ---
+GET: Array
+(
+    [id] => 11
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"en_entrega"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 11
+Input decodificado: Array
+(
+    [estado] => en_entrega
+)
+
+Nuevo estado: en_entrega
+Estado actual: listo
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":11,"nuevo_estado":"en_entrega","estado_anterior":"listo"}
+--- Fin de la solicitud ---
+
+--- Nueva solicitud: 2025-05-20 01:00:34 ---
+GET: Array
+(
+    [id] => 11
+)
+
+POST: Array
+(
+)
+
+Input: {"estado":"entregado"}
+Archivos incluidos correctamente
+Usuario autenticado: mesero
+ID de pedido: 11
+Input decodificado: Array
+(
+    [estado] => entregado
+)
+
+Nuevo estado: entregado
+Estado actual: en_entrega
+Resultado de actualización: éxito
+Respuesta exitosa: {"status":"success","message":"Estado actualizado correctamente","pedido_id":11,"nuevo_estado":"entregado","estado_anterior":"en_entrega"}
+--- Fin de la solicitud ---
+
