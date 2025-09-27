@@ -1,10 +1,4 @@
 <?php
-// cocina.php - Vista para cocineros (archivo principal)
-require_once 'database.php';
-require_once 'auth_functions.php';
-
-// Verificar que el usuario sea cocinero o admin
-require_cocinero();
 ?>
 <!DOCTYPE html>
 <html lang="es">

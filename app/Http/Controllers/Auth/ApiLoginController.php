@@ -40,4 +40,23 @@ class ApiLoginController extends Controller
         $request->user()->currentAccessToken()?->delete();
         return response()->json(['ok' => true]);
     }
+    public function authenticated(Request $request, $user)
+{
+    // Redirigir según el rol del usuario
+    if ($user->rol === 'admin') {
+        return redirect('/admin/dashboard');
+    }
+
+    if ($user->rol === 'empleado') {
+        return redirect('/empleado/panel');
+    }
+
+    if ($user->rol === 'cliente') {
+        return redirect('/cliente/inicio');
+    }
+
+    // Si no tiene rol válido, cerrar sesión por seguridad
+    Auth::logout();
+    return redirect('/login')->withErrors(['rol' => 'Rol no autorizado.']);
+}
 }

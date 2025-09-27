@@ -1,24 +1,5 @@
 <?php
-// Incluir conexión a la base de datos
-require_once 'database.php';
 
-// Obtener bebidas de la base de datos
-$query_bebidas = "SELECT id, nombre, descripcion, precio, imagen FROM menu_items WHERE categoria = 'bebida' AND disponible = 1";
-$result_bebidas = $conexion->query($query_bebidas);
-
-// Separar en bebidas destacadas y bebidas principales
-$bebidas_destacadas = [];
-$bebidas_principales = [];
-
-if ($result_bebidas && $result_bebidas->num_rows > 0) {
-    while ($bebida = $result_bebidas->fetch_assoc()) {
-        if (count($bebidas_destacadas) < 3) {
-            $bebidas_destacadas[] = $bebida;
-        } else {
-            $bebidas_principales[] = $bebida;
-        }
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
