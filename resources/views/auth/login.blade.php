@@ -82,6 +82,7 @@
       @csrf
       <label for="usuario">Usuario</label>
       <input id="usuario" type="text" name="usuario" value="{{ old('usuario') }}" placeholder="Tu usuario" required>
+      main
 
       <label for="password">Contraseña</label>
       <input id="password" type="password" name="password" placeholder="Tu contraseña" required>

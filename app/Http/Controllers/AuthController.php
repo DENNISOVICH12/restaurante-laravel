@@ -70,4 +70,4 @@ class AuthController extends Controller
             default    => redirect()->route('cliente.panel'),
         };
     }
-}
+
