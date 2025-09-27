@@ -71,11 +71,22 @@ class UsuarioController extends Controller
             'nombre'   => ['required','string','max:120'],
             'apellido' => ['nullable','string','max:120'],
             'correo'   => ['required','email','max:180','unique:usuarios,correo'],
+            'rol' => 'required|string',
             'activo'   => ['boolean'],
         ]);
 
-        $u = Usuario::create($data);
-        return response()->json($u, 201);
+        $usuario = Usuario::create([
+        'usuario' => $request->usuario,
+        'password' => bcrypt($request->password),
+        'nombre' => $request->nombre,
+        'apellido' => $request->apellido,
+        'correo' => $request->correo,
+        'rol' => $request->rol,
+        'activo' => $request->activo ?? true,
+        'restaurant_id' => $request->restaurant_id ?? 1,
+    ]);
+
+    return response()->json($usuario, 201);
     }
 
     /**

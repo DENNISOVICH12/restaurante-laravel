@@ -9,7 +9,7 @@ class Usuario extends Model
     protected $table = 'usuarios';
 
     protected $fillable = [
-        'usuario', 'password', 'nombre', 'apellido', 'correo', 'activo',
+        'usuario', 'password', 'nombre', 'apellido', 'correo', 'activo', 'rol','restaurant_id'
     ];
 
     protected $casts = [
