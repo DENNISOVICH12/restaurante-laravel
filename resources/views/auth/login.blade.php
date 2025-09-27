@@ -80,8 +80,9 @@
 
     <form method="POST" action="{{ url('/login') }}">
       @csrf
-      <label for="usuario">Usuario o correo</label>
-      <input id="usuario" type="text" name="usuario" value="{{ old('usuario') }}" placeholder="Ingresa tu usuario o correo" autocomplete="username" required>
+      <label for="usuario">Usuario</label>
+      <input id="usuario" type="text" name="usuario" value="{{ old('usuario') }}" placeholder="Tu usuario" required>
+      main
 
       <label for="password">Contraseña</label>
       <input id="password" type="password" name="password" placeholder="Tu contraseña" required>
