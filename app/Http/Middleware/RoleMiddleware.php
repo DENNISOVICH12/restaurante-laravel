@@ -14,11 +14,12 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        $user = Session::get('user');
-        if (!$user) {
-            return redirect('/login');
+        $user = $request->user();
+        if (!$user || !in_array($user->rol, $roles, true)) {
+            return response()->json(['message' => 'No autorizado'], 403);
         }
-
+        return $next($request);
+        
         $rol = strtolower($user['rol'] ?? '');
         $roles = array_map('strtolower', $roles);
 

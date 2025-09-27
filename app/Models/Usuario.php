@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * @OA\Schema(
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Usuario extends Model
 {
+    use HasApiTokens; // + lo que ya tenías
     protected $table = 'usuarios';
 
     protected $fillable = [

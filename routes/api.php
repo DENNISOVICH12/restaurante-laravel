@@ -7,6 +7,7 @@ use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\Auth\ApiLoginController;
 
 
 Route::get('/ping', [HealthController::class, 'ping']);
@@ -44,11 +45,15 @@ Route::get   ('pedidos/{id}/detalle',[PedidoController::class, 'detalle']);
 // Detalle (lectura; crear/editar/eliminar se haría en otra iteración si quieres)
 Route::get('/pedidos/{id}/detalle', [PedidoController::class, 'detalle']);
 Route::apiResource('usuarios', UsuarioController::class);
-Route::post('login', [UsuarioController::class, 'login']);
+Route::post('login', [ApiLoginController::class, 'login']);
+Route::post('logout', [ApiLoginController::class, 'logout'])->middleware('auth:sanctum');
 use App\Http\Controllers\PlatoTableController;
 use App\Http\Controllers\BebidaTableController;
 
 Route::get('platos-fisicos', [PlatoTableController::class, 'index']);
 Route::get('bebidas-fisicas', [BebidaTableController::class, 'index']);
+Route::middleware(['auth:sanctum','role:admin'])->group(function () {
+    Route::get('admin/dashboard', fn() => response()->json(['ok'=>true]));
+});
 
 
