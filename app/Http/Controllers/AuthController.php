@@ -21,32 +21,38 @@ class AuthController extends Controller
         'password' => ['required','string'],
     ]);
 
-    // intenta con el campo 'usuario'
     $ok = Auth::attempt(
         ['usuario' => $cred['usuario'], 'password' => $cred['password']],
         $request->boolean('remember')
     );
 
     if (!$ok) {
+        Log::warning('LOGIN FAIL', ['u' => $cred['usuario']]);
         return back()->withErrors(['usuario' => 'Credenciales inválidas'])->withInput();
     }
 
-    // muy importante para fijar la sesión
+    // MUY importante
     $request->session()->regenerate();
 
     $user = Auth::user();
+    $rol  = strtolower((string)$user->rol);
+    Log::info('LOGIN OK', ['id' => $user->id, 'rol' => $rol]);
 
-    return match ($user->rol) {
-        'admin'    => redirect()->route('admin.panel'),
-        'cocinero' => redirect()->route('cocina.panel'),
-        'mesero'   => redirect()->route('meseros.panel'),
-        'cliente'  => redirect()->route('cliente.panel'),
-        default    => redirect()->route('cliente.panel'),
+    $route = match ($rol) {
+        'admin'    => 'admin.panel',
+        'cocinero' => 'cocina.panel',
+        'mesero'   => 'meseros.panel',
+        'cliente'  => 'cliente.panel',
+        default    => 'cliente.panel',
     };
+
+    // Si llegó aquí porque intentó abrir /administracion sin login,
+    // lo devolvemos donde quería entrar; si no, al panel por rol.
+    return redirect()->intended(route($route));
 }
 
 
-    public function logout(Request $request)
+    public function logout($request)
     {
         Auth::logout();
         $request->session()->invalidate();
