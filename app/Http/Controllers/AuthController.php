@@ -10,40 +10,39 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        // Vista simple de login (ver más abajo)
+        if (Auth::check()) {
+            return $this->redirectForRole(Auth::user());
+        }
+
         return view('auth.login');
     }
 
     public function doLogin(Request $request)
-{
-    $cred = $request->validate([
-        'usuario'  => ['required','string'],
-        'password' => ['required','string'],
-    ]);
+    {
+        $cred = $request->validate([
+            'usuario'  => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
 
-    // intenta con el campo 'usuario'
-    $ok = Auth::attempt(
-        ['usuario' => $cred['usuario'], 'password' => $cred['password']],
-        $request->boolean('remember')
-    );
+        $login = trim($cred['usuario']);
+        $remember = $request->boolean('remember');
 
-    if (!$ok) {
-        return back()->withErrors(['usuario' => 'Credenciales inválidas'])->withInput();
+        $attempted = $this->attemptLogin(['usuario' => $login, 'password' => $cred['password']], $remember);
+
+        if (!$attempted && filter_var($login, FILTER_VALIDATE_EMAIL)) {
+            $attempted = $this->attemptLogin(['correo' => $login, 'password' => $cred['password']], $remember);
+        }
+
+        if (!$attempted) {
+            return back()->withErrors([
+                'usuario' => 'Las credenciales proporcionadas no son válidas.',
+            ])->withInput();
+        }
+
+        $request->session()->regenerate();
+
+        return $this->redirectForRole(Auth::user());
     }
-
-    // muy importante para fijar la sesión
-    $request->session()->regenerate();
-
-    $user = Auth::user();
-
-    return match ($user->rol) {
-        'admin'    => redirect()->route('admin.panel'),
-        'cocinero' => redirect()->route('cocina.panel'),
-        'mesero'   => redirect()->route('meseros.panel'),
-        'cliente'  => redirect()->route('cliente.panel'),
-        default    => redirect()->route('cliente.panel'),
-    };
-}
 
 
     public function logout(Request $request)
@@ -52,5 +51,23 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('login');
+    }
+
+    protected function attemptLogin(array $credentials, bool $remember = false): bool
+    {
+        $credentials['activo'] = true;
+
+        return Auth::attempt($credentials, $remember);
+    }
+
+    protected function redirectForRole(Usuario $user)
+    {
+        return match (strtolower($user->rol)) {
+            'admin'    => redirect()->route('admin.panel'),
+            'cocinero' => redirect()->route('cocina.panel'),
+            'mesero'   => redirect()->route('meseros.panel'),
+            'cliente'  => redirect()->route('cliente.panel'),
+            default    => redirect()->route('cliente.panel'),
+        };
     }
 }

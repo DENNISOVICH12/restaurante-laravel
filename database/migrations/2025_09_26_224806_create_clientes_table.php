@@ -9,9 +9,10 @@ return new class extends Migration {
     {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('email')->nullable();
-            $table->timestamps();
+            $table->string('nombre_cliente', 255);
+            $table->string('telefono', 50)->nullable();
+            $table->string('direccion', 255)->nullable();
+            $table->timestamp('fecha_registro')->nullable()->useCurrent();
         });
     }
 
