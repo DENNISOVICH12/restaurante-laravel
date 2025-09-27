@@ -1,98 +1,101 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Iniciar sesión</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0b1020; --card:#111733; --text:#e8ecff; --muted:#a8b0d8;
-      --primary:#6ea8ff; --primary-2:#4177ff; --ring:rgba(110,168,255,.35);
-      --error:#ff6b6b; --success:#42d392;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; min-height:100%; display:grid; place-items:center;
-      background: radial-gradient(1000px 600px at 20% -10%, #16224c 0%, transparent 60%) no-repeat,
-                  radial-gradient(800px 500px at 120% 30%, #1b2a66 0%, transparent 55%) no-repeat,
-                  var(--bg);
-      color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    }
-    .card{
-      width:min(92vw, 520px);
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px; padding:28px 26px 26px;
-      box-shadow:0 20px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05);
-      backdrop-filter: blur(6px);
-    }
-    h1{margin:0 0 8px; font-size:26px; font-weight:700; letter-spacing:.2px}
-    .sub{color:var(--muted); margin:0 0 20px; font-size:14px}
-    .alert{
-      padding:10px 12px; border-radius:10px; font-size:14px; margin:10px 0 14px; border:1px solid transparent;
-    }
-    .alert.error{background:rgba(255,107,107,.08); border-color:rgba(255,107,107,.35); color:#ffdede}
-    .alert.success{background:rgba(66,211,146,.08); border-color:rgba(66,211,146,.35); color:#d9ffea}
-    label{display:block; font-size:13px; color:var(--muted); margin:14px 0 6px}
-    input{
-      width:100%; padding:12px 12px; border-radius:12px;
-      background:#0f1530; border:1px solid rgba(255,255,255,.08);
-      color:var(--text); font-size:15px; outline:none;
-      transition:border .15s, box-shadow .15s, transform .02s;
-    }
-    input:focus{border-color:var(--primary); box-shadow:0 0 0 6px var(--ring)}
-    .btn{
-      margin-top:18px; width:100%; padding:12px 14px; font-size:15px; font-weight:600;
-      border:none; border-radius:12px; color:#0b1020;
-      background:linear-gradient(180deg,var(--primary),var(--primary-2));
-      box-shadow: 0 12px 30px rgba(65,119,255,.35); cursor:pointer;
-      transition: transform .05s ease, filter .15s ease;
-    }
-    .btn:active{transform: translateY(1px)}
-    .row{display:flex; justify-content:space-between; align-items:center; margin-top:10px}
-    .meta{margin-top:14px; color:var(--muted); font-size:14px; text-align:center}
-    .meta a{color:var(--primary); text-decoration:none}
-    .meta a:hover{filter:brightness(1.1)}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-box {
+            background: white;
+            padding: 28px 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 380px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+        }
+        button {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease-in-out;
+        }
+        button:hover {
+            background-color: #1e40af;
+        }
+        .error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <main class="card">
-    <h1>Iniciar sesión</h1>
-    <p class="sub">Accede a tu cuenta para gestionar pedidos.</p>
 
-    @if (session('success'))
-      <div class="alert success">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-      <div class="alert error">{{ session('error') }}</div>
-    @endif
+<div class="login-box">
+    <h1>Iniciar Sesión</h1>
+
+    {{-- Mostrar mensaje de error si las credenciales fallan --}}
     @if ($errors->any())
-      <div class="alert error">
-        <ul style="margin:0 0 0 16px">
-          @foreach ($errors->all() as $e)
-            <li>{{ $e }}</li>
-          @endforeach
-        </ul>
-      </div>
+        <div class="error">
+            {{ $errors->first('usuario') }}
+        </div>
     @endif
 
     <form method="POST" action="{{ url('/login') }}">
-      @csrf
-      <label for="usuario">Usuario</label>
-      <input id="usuario" type="text" name="usuario" value="{{ old('usuario') }}" placeholder="Tu usuario" required>
+        @csrf
 
-      <label for="password">Contraseña</label>
-      <input id="password" type="password" name="password" placeholder="Tu contraseña" required>
+        <label for="usuario">Usuario</label>
+        <input type="text" name="usuario" id="usuario" value="{{ old('usuario') }}" required autofocus>
 
-      <button class="btn" type="submit">Entrar</button>
+        <label for="password">Contraseña</label>
+        <input type="password" name="password" id="password" required>
+
+        <button type="submit">Entrar</button>
     </form>
+</div>
 
-    <p class="meta">
-      ¿No tienes cuenta?
-      <a href="{{ route('registro') }}">Regístrate</a>
-    </p>
-  </main>
 </body>
 </html>

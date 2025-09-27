@@ -22,7 +22,7 @@ class Usuario extends Authenticatable // <—
     // si tu login usa el campo "usuario", no "email"
     public function getAuthIdentifierName()
     {
-        return 'usuario';
+        return 'email';
     }
 
     // Hash automático del password
