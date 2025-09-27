@@ -19,6 +19,7 @@ class UsuarioController extends Controller
      *         @OA\Items(ref="#/components/schemas/Usuario")
      *       ),
      *       @OA\Property(property="current_page", type="integer"),
+     *       @OA\Property(property="per_page", type="integer"),
      *       @OA\Property(property="total", type="integer")
      *     )
      *   )
@@ -50,13 +51,17 @@ class UsuarioController extends Controller
      *   tags={"Usuarios"},
      *   summary="Crear usuario",
      *   @OA\RequestBody(required=true,
-     *     @OA\JsonContent(required={"usuario","password","nombre","correo"},
+     *     @OA\JsonContent(
+     *       required={"usuario","password","nombre","correo","rol"},
      *       @OA\Property(property="usuario", type="string", example="admin"),
      *       @OA\Property(property="password", type="string", example="secreto123"),
      *       @OA\Property(property="nombre", type="string", example="Admin"),
      *       @OA\Property(property="apellido", type="string", nullable=true, example="Demo"),
      *       @OA\Property(property="correo", type="string", format="email", example="admin@example.com"),
-     *       @OA\Property(property="activo", type="boolean", example=true)
+     *       @OA\Property(property="rol", type="string", example="admin",
+     *         description="admin|gerente|cajero|mozo|cocinero|empleado"),
+     *       @OA\Property(property="activo", type="boolean", example=true),
+     *       @OA\Property(property="restaurant_id", type="integer", example=1)
      *     )
      *   ),
      *   @OA\Response(response=201, description="Creado", @OA\JsonContent(ref="#/components/schemas/Usuario")),
@@ -66,27 +71,28 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'usuario'  => ['required','string','max:50','unique:usuarios,usuario'],
-            'password' => ['required','string','min:6'],
-            'nombre'   => ['required','string','max:120'],
-            'apellido' => ['nullable','string','max:120'],
-            'correo'   => ['required','email','max:180','unique:usuarios,correo'],
-            'rol' => 'required|string',
-            'activo'   => ['boolean'],
+            'usuario'       => ['required','string','max:50','unique:usuarios,usuario'],
+            'password'      => ['required','string','min:6'],
+            'nombre'        => ['required','string','max:120'],
+            'apellido'      => ['nullable','string','max:120'],
+            'correo'        => ['required','email','max:180','unique:usuarios,correo'],
+            'rol'           => ['required','string'], // puedes usar Rule::in([...]) para restringir
+            'activo'        => ['boolean'],
+            'restaurant_id' => ['nullable','integer'],
         ]);
 
         $usuario = Usuario::create([
-        'usuario' => $request->usuario,
-        'password' => bcrypt($request->password),
-        'nombre' => $request->nombre,
-        'apellido' => $request->apellido,
-        'correo' => $request->correo,
-        'rol' => $request->rol,
-        'activo' => $request->activo ?? true,
-        'restaurant_id' => $request->restaurant_id ?? 1,
-    ]);
+            'usuario'       => $data['usuario'],
+            'password'      => $data['password'], // el mutator lo hashea
+            'nombre'        => $data['nombre'],
+            'apellido'      => $data['apellido'] ?? null,
+            'correo'        => $data['correo'],
+            'rol'           => $data['rol'],
+            'activo'        => $data['activo'] ?? true,
+            'restaurant_id' => $data['restaurant_id'] ?? 1,
+        ]);
 
-    return response()->json($usuario, 201);
+        return response()->json($usuario, 201);
     }
 
     /**
@@ -102,7 +108,9 @@ class UsuarioController extends Controller
      *       @OA\Property(property="nombre", type="string", example="Admin"),
      *       @OA\Property(property="apellido", type="string", nullable=true, example="Demo"),
      *       @OA\Property(property="correo", type="string", format="email", example="admin2@example.com"),
-     *       @OA\Property(property="activo", type="boolean", example=false)
+     *       @OA\Property(property="rol", type="string", example="gerente"),
+     *       @OA\Property(property="activo", type="boolean", example=false),
+     *       @OA\Property(property="restaurant_id", type="integer", example=1)
      *     )
      *   ),
      *   @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/Usuario")),
@@ -115,15 +123,19 @@ class UsuarioController extends Controller
         $u = Usuario::findOrFail($id);
 
         $data = $request->validate([
-            'usuario'  => ['sometimes','string','max:50', Rule::unique('usuarios','usuario')->ignore($u->id)],
-            'password' => ['sometimes','string','min:6'],
-            'nombre'   => ['sometimes','string','max:120'],
-            'apellido' => ['sometimes','nullable','string','max:120'],
-            'correo'   => ['sometimes','email','max:180', Rule::unique('usuarios','correo')->ignore($u->id)],
-            'activo'   => ['sometimes','boolean'],
+            'usuario'       => ['sometimes','string','max:50', Rule::unique('usuarios','usuario')->ignore($u->id)],
+            'password'      => ['sometimes','string','min:6'],
+            'nombre'        => ['sometimes','string','max:120'],
+            'apellido'      => ['sometimes','nullable','string','max:120'],
+            'correo'        => ['sometimes','email','max:180', Rule::unique('usuarios','correo')->ignore($u->id)],
+            'rol'           => ['sometimes','string'],
+            'activo'        => ['sometimes','boolean'],
+            'restaurant_id' => ['sometimes','integer'],
         ]);
 
+        // Al asignar "password" plano, el mutator lo hashea
         $u->update($data);
+
         return response()->json($u);
     }
 

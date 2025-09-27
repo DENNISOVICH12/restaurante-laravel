@@ -27,6 +27,9 @@ Route::delete('/menu-items/{id}', [MenuItemController::class, 'destroy']);
 
 // Menú
 Route::get('/menu/today', [MenuController::class, 'showToday']);
+// usuarios
+Route::apiResource('usuarios', UsuarioController::class);
+
 
 // Pedidos
 Route::get('/pedidos', [PedidoController::class, 'index']);
