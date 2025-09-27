@@ -4,59 +4,67 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Usuario;
 
 class AuthController extends Controller
 {
+    /**
+     * Mostrar formulario de login
+     */
     public function showLogin()
     {
-        // Vista simple de login (ver más abajo)
         return view('auth.login');
     }
 
+    /**
+     * Procesar el inicio de sesión
+     */
     public function doLogin(Request $request)
-{
-    $cred = $request->validate([
-        'usuario'  => ['required','string'],
-        'password' => ['required','string'],
-    ]);
+    {
+        // Validar datos enviados desde el formulario
+        $credentials = $request->validate([
+            'usuario'  => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
 
-    $ok = Auth::attempt(
-        ['usuario' => $cred['usuario'], 'password' => $cred['password']],
-        $request->boolean('remember')
-    );
+        // Intentar autenticación con el campo "usuario"
+        if (Auth::attempt([
+            'usuario' => $credentials['usuario'],
+            'password' => $credentials['password']
+        ])) {
+            $request->session()->regenerate();
 
-    if (!$ok) {
-        Log::warning('LOGIN FAIL', ['u' => $cred['usuario']]);
-        return back()->withErrors(['usuario' => 'Credenciales inválidas'])->withInput();
+            // Obtener el rol del usuario autenticado
+            $user = Auth::user();
+            $rol = strtolower($user->rol ?? '');
+
+            // Redirigir según el rol
+            return match ($rol) {
+                'admin'    => redirect()->route('admin.panel'),
+                'cocinero' => redirect()->route('cocina.panel'),
+                'mesero'   => redirect()->route('meseros.panel'),
+                'cliente'  => redirect()->route('cliente.panel'),
+                default    => redirect()->route('cliente.panel'),
+            };
+        }
+
+        // Si las credenciales fallan, volver con error
+        return back()->withErrors([
+            'usuario' => 'Credenciales incorrectas o usuario inactivo.'
+        ])->onlyInput('usuario');
     }
 
-    // MUY importante
-    $request->session()->regenerate();
-
-    $user = Auth::user();
-    $rol  = strtolower((string)$user->rol);
-    Log::info('LOGIN OK', ['id' => $user->id, 'rol' => $rol]);
-
-    $route = match ($rol) {
-        'admin'    => 'admin.panel',
-        'cocinero' => 'cocina.panel',
-        'mesero'   => 'meseros.panel',
-        'cliente'  => 'cliente.panel',
-        default    => 'cliente.panel',
-    };
-
-    // Si llegó aquí porque intentó abrir /administracion sin login,
-    // lo devolvemos donde quería entrar; si no, al panel por rol.
-    return redirect()->intended(route($route));
-}
-
-
-    public function logout($request)
+    /**
+     * Cerrar sesión
+     */
+    public function logout(Request $request)
     {
         Auth::logout();
+
+        // Invalidar sesión y token
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        // Redirigir al login
         return redirect()->route('login');
     }
 }
