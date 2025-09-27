@@ -15,35 +15,35 @@ class AuthController extends Controller
     }
 
     public function doLogin(Request $request)
-{
-    $cred = $request->validate([
-        'usuario'  => ['required','string'],
-        'password' => ['required','string'],
-    ]);
+    {
+        $cred = $request->validate([
+            'usuario'  => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
 
-    // intenta con el campo 'usuario'
-    $ok = Auth::attempt(
-        ['usuario' => $cred['usuario'], 'password' => $cred['password']],
-        $request->boolean('remember')
-    );
+        // intenta con el campo 'usuario'
+        $ok = Auth::attempt(
+            ['usuario' => $cred['usuario'], 'password' => $cred['password']],
+            $request->boolean('remember')
+        );
 
-    if (!$ok) {
-        return back()->withErrors(['usuario' => 'Credenciales inválidas'])->withInput();
+        if (!$ok) {
+            return back()->withErrors(['usuario' => 'Credenciales inválidas'])->withInput();
+        }
+
+        // muy importante para fijar la sesión
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        return match ($user->rol) {
+            'admin'    => redirect()->route('admin.panel'),
+            'cocinero' => redirect()->route('cocina.panel'),
+            'mesero'   => redirect()->route('meseros.panel'),
+            'cliente'  => redirect()->route('cliente.panel'),
+            default    => redirect()->route('cliente.panel'),
+        };
     }
-
-    // muy importante para fijar la sesión
-    $request->session()->regenerate();
-
-    $user = Auth::user();
-
-    return match ($user->rol) {
-        'admin'    => redirect()->route('admin.panel'),
-        'cocinero' => redirect()->route('cocina.panel'),
-        'mesero'   => redirect()->route('meseros.panel'),
-        'cliente'  => redirect()->route('cliente.panel'),
-        default    => redirect()->route('cliente.panel'),
-    };
-}
 
 
     public function logout(Request $request)
