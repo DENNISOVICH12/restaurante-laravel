@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Pedido;
 use App\Models\DetallePedido;
 use App\Models\MenuItem;
-use App\Models\Plato;
-use App\Models\Bebida;
+use App\Http\Requests\PedidoStoreRequest;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class PedidoController extends Controller
 {
@@ -31,7 +31,7 @@ class PedidoController extends Controller
     {
         $q = Pedido::with('cliente')->orderBy('id','desc');
         if ($e = $request->query('estado'))     $q->where('estado',$e);
-        if ($c = $request->query('id_cliente')) $q->where('id_cliente',$c);
+        if ($c = $request->query('id_cliente')) $q->where('cliente_id',$c);
 
         $p = $q->paginate(10);
         $meta = [
@@ -69,7 +69,6 @@ class PedidoController extends Controller
      *   @OA\RequestBody(required=true,@OA\JsonContent(
      *     required={"id_cliente","items"},
      *     @OA\Property(property="id_cliente",type="integer",example=1),
-     *     @OA\Property(property="mesa",type="string",example="A3"),
      *     @OA\Property(property="estado",type="string",example="pendiente"),
      *     @OA\Property(property="items",type="array",
      *       @OA\Items(
@@ -86,71 +85,52 @@ class PedidoController extends Controller
      *   @OA\Response(response=422, description="Datos inválidos")
      * )
      */
-    public function store(Request $request): JsonResponse
-{
-    $data = $request->validate([
-        // usa cliente_id (como está en la BD)
-        'cliente_id'    => 'required|integer|exists:clientes,id',
-        // restaurant_id es NOT NULL en tu tabla: pásalo o define un default
-        'restaurant_id' => 'sometimes|integer|exists:restaurants,id',
-        'estado'        => 'sometimes|in:pendiente,en_entrega,listo,entregado,cancelado',
+    public function store(PedidoStoreRequest $request): JsonResponse
+    {
+        $data = $request->validated();
 
-        'items'   => 'required|array|min:1',
-        'items.*.id_menu_item'    => 'nullable|integer|exists:menu_items,id',
-        'items.*.nombre_producto' => 'required_without:items.*.id_menu_item|string|max:100',
-        'items.*.precio'          => 'required_without:items.*.id_menu_item|numeric|min:0',
-        'items.*.categoria'       => 'required_without:items.*.id_menu_item|string|max:50',
-        'items.*.cantidad'        => 'required|integer|min:1',
-        'items.*.descripcion'     => 'nullable|string',
-    ]);
+        $pedido = DB::transaction(function () use ($data) {
+            $pedido = Pedido::create([
+                'cliente_id' => $data['id_cliente'],
+                'estado'     => $data['estado'] ?? 'pendiente',
+            ]);
 
-    $pedido = Pedido::create([
-        'cliente_id'    => $data['cliente_id'],
-        'restaurant_id' => $data['restaurant_id'] ?? 1, // o el que corresponda
-        'estado'        => $data['estado'] ?? 'pendiente',
-        // NO guardamos mesa/fecha porque no existen en tu tabla
-    ]);
+            foreach ($data['items'] as $item) {
+                $menuItem = null;
+                if (!empty($item['id_menu_item'])) {
+                    $menuItem = MenuItem::find($item['id_menu_item']);
+                }
 
-    foreach ($data['items'] as $it) {
-        $nombre      = $it['nombre_producto'] ?? null;
-        $precio      = $it['precio'] ?? null;
-        $categoria   = $it['categoria'] ?? null;
-        $descripcion = $it['descripcion'] ?? null;
+                $nombre      = $menuItem->nombre ?? $item['nombre_producto'];
+                $precio      = $menuItem->precio ?? $item['precio'];
+                $categoria   = $menuItem->categoria ?? $item['categoria'];
+                $descripcion = $item['descripcion'] ?? ($menuItem->descripcion ?? null);
 
-        if (!empty($it['id_menu_item'])) {
-            $mi = MenuItem::find($it['id_menu_item']);
-            if ($mi) {
-                $nombre      = $mi->nombre;
-                $precio      = $mi->precio;
-                $categoria   = $mi->categoria;
-                $descripcion = $descripcion ?? $mi->descripcion;
+                DetallePedido::create([
+                    'id_pedido'       => $pedido->id,
+                    'nombre_producto' => $nombre,
+                    'precio'          => $precio,
+                    'cantidad'        => (int) $item['cantidad'],
+                    'categoria'       => $categoria,
+                    'descripcion'     => $descripcion,
+                ]);
             }
-        }
 
-        // usa pedido_id (como está en la FK)
-        DetallePedido::create([
-            'pedido_id'       => $pedido->id,
-            'nombre_producto' => $nombre,
-            'precio'          => $precio,
-            'cantidad'        => (int)$it['cantidad'],
-            'categoria'       => $categoria,      // asegúrate que existe esta columna
-            'descripcion'     => $descripcion,    // y esta si la quieres usar
-        ]);
+            return $pedido;
+        });
+
+        $pedido->load(['cliente', 'detalle']);
+
+        return $this->created('Pedido creado', $pedido);
     }
-
-    $pedido->load(['cliente','detalle']);
-
-    return $this->created('Pedido creado', $pedido);
-}
 
     /**
      * @OA\Put(
      *   path="/api/pedidos/{id}",
-     *   summary="Actualizar pedido (mesa/estado)",
+     *   summary="Actualizar pedido (estado)",
      *   tags={"Pedidos"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\RequestBody(@OA\JsonContent(
-     *     @OA\Property(property="mesa",type="string"),
      *     @OA\Property(property="estado",type="string",enum={"pendiente","en_entrega","listo","entregado","cancelado"})
      *   )),
      *   @OA\Response(response=200, description="OK"),
@@ -164,7 +144,6 @@ class PedidoController extends Controller
         if (!$pedido) return $this->notFound();
 
         $data = $request->validate([
-            'mesa'   => 'sometimes|nullable|string|max:50',
             'estado' => 'sometimes|in:pendiente,en_entrega,listo,entregado,cancelado',
         ]);
 
