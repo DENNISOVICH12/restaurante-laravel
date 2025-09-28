@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Pedido;
 use App\Models\DetallePedido;
 use App\Models\MenuItem;
+
 use App\Http\Requests\PedidoStoreRequest;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+
 
 class PedidoController extends Controller
 {
@@ -91,8 +93,7 @@ class PedidoController extends Controller
 
         $pedido = DB::transaction(function () use ($data) {
             $pedido = Pedido::create([
-                'cliente_id' => $data['id_cliente'],
-                'estado'     => $data['estado'] ?? 'pendiente',
+
             ]);
 
             foreach ($data['items'] as $item) {
@@ -118,8 +119,6 @@ class PedidoController extends Controller
 
             return $pedido;
         });
-
-        $pedido->load(['cliente', 'detalle']);
 
         return $this->created('Pedido creado', $pedido);
     }
