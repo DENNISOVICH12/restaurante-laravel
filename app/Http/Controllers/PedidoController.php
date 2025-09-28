@@ -32,9 +32,15 @@ class PedidoController extends Controller
      */
     public function index(Request $request)
     {
-        $q = Pedido::with('cliente')->orderBy('id','desc');
-        if ($e = $request->query('estado'))     $q->where('estado',$e);
-        if ($c = $request->query('id_cliente')) $q->where('id_cliente',$c);
+        $q = Pedido::with('cliente')->orderBy('id', 'desc');
+
+        if ($estado = $request->query('estado')) {
+            $q->where('estado', $estado);
+        }
+
+        if ($clienteId = $request->query('id_cliente')) {
+            $q->where('id_cliente', $clienteId);
+        }
 
         $p = $q->paginate(10);
         $meta = [
