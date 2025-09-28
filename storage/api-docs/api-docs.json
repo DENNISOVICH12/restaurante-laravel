@@ -64,15 +64,14 @@
                     "Clientes"
                 ],
                 "summary": "Crear cliente",
-                "operationId": "ClientesStore",
+                "operationId": "4ac6cdfa8d6c188fa2cb4f3263d4318a",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "nombre_cliente",
-                                    "telefono"
+                                    "nombre_cliente"
                                 ],
                                 "properties": {
                                     "nombre_cliente": {
@@ -86,6 +85,10 @@
                                     "direccion": {
                                         "type": "string",
                                         "example": "Calle 10 #5-20"
+                                    },
+                                    "restaurant_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -757,6 +760,9 @@
                                         "current_page": {
                                             "type": "integer"
                                         },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
                                         "total": {
                                             "type": "integer"
                                         }
@@ -783,7 +789,8 @@
                                     "usuario",
                                     "password",
                                     "nombre",
-                                    "correo"
+                                    "correo",
+                                    "rol"
                                 ],
                                 "properties": {
                                     "usuario": {
@@ -808,9 +815,18 @@
                                         "format": "email",
                                         "example": "admin@example.com"
                                     },
+                                    "rol": {
+                                        "description": "admin|gerente|cajero|mozo|cocinero|empleado",
+                                        "type": "string",
+                                        "example": "admin"
+                                    },
                                     "activo": {
                                         "type": "boolean",
                                         "example": true
+                                    },
+                                    "restaurant_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -912,9 +928,17 @@
                                         "format": "email",
                                         "example": "admin2@example.com"
                                     },
+                                    "rol": {
+                                        "type": "string",
+                                        "example": "gerente"
+                                    },
                                     "activo": {
                                         "type": "boolean",
                                         "example": false
+                                    },
+                                    "restaurant_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"

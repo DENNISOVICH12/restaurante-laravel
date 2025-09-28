@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class MenuItemController extends Controller
 {
@@ -47,7 +47,8 @@ class MenuItemController extends Controller
      *       @OA\Property(property="categoria", type="string", example="bebida"),
      *       @OA\Property(property="precio", type="number", format="float", example=6.5),
      *       @OA\Property(property="imagen", type="string", nullable=true, example="limonada.jpg"),
-     *       @OA\Property(property="disponible", type="boolean", example=true)
+     *       @OA\Property(property="disponible", type="boolean", example=true),
+     *       @OA\Property(property="restaurant_id", type="integer", example=1)
      *     )
      *   ),
      *   @OA\Response(response=201, description="Creado"),
@@ -57,16 +58,104 @@ class MenuItemController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nombre'      => ['required','string','max:120'],
-            'descripcion' => ['nullable','string'],
-            'categoria'   => ['required','string'], // ej: 'plato' | 'bebida'
-            'precio'      => ['required','numeric'],
-            'imagen'      => ['nullable','string'],
-            'disponible'  => ['boolean'],
+            'nombre'        => ['required','string','max:120'],
+            'descripcion'   => ['nullable','string'],
+            'categoria'     => ['required','string'], // ej: 'plato' | 'bebida'
+            'precio'        => ['required','numeric'],
+            'imagen'        => ['nullable','string'],
+            'disponible'    => ['boolean'],
+            'restaurant_id' => ['nullable','integer'],
         ]);
+
+        $data['disponible']    = $data['disponible']    ?? true;
+        $data['restaurant_id'] = $data['restaurant_id'] ?? 1;
 
         $item = MenuItem::create($data);
         return response()->json($item, 201);
+    }
+
+    /**
+     * @OA\Post(
+     *   path="/api/menu-items/bulk",
+     *   tags={"Menu Items"},
+     *   summary="Crear múltiples ítems del menú (bulk)",
+     *   description="Acepta **array plano** de objetos o `{ \"items\": [ ... ] }`.",
+     *   @OA\RequestBody(required=true,
+     *     @OA\JsonContent(
+     *       oneOf={
+     *         @OA\Schema(
+     *           type="array",
+     *           @OA\Items(
+     *             required={"nombre","categoria","precio"},
+     *             @OA\Property(property="nombre", type="string"),
+     *             @OA\Property(property="descripcion", type="string", nullable=true),
+     *             @OA\Property(property="categoria", type="string"),
+     *             @OA\Property(property="precio", type="number"),
+     *             @OA\Property(property="imagen", type="string", nullable=true),
+     *             @OA\Property(property="disponible", type="boolean"),
+     *             @OA\Property(property="restaurant_id", type="integer")
+     *           )
+     *         ),
+     *         @OA\Schema(
+     *           type="object",
+     *           @OA\Property(
+     *             property="items",
+     *             type="array",
+     *             @OA\Items(
+     *               required={"nombre","categoria","precio"},
+     *               @OA\Property(property="nombre", type="string"),
+     *               @OA\Property(property="descripcion", type="string", nullable=true),
+     *               @OA\Property(property="categoria", type="string"),
+     *               @OA\Property(property="precio", type="number"),
+     *               @OA\Property(property="imagen", type="string", nullable=true),
+     *               @OA\Property(property="disponible", type="boolean"),
+     *               @OA\Property(property="restaurant_id", type="integer")
+     *             )
+     *           )
+     *         )
+     *       }
+     *     )
+     *   ),
+     *   @OA\Response(response=201, description="Creados"),
+     *   @OA\Response(response=422, description="Validación fallida")
+     * )
+     */
+    public function storeBulk(Request $request)
+    {
+        // Soportar cuerpo como array plano o como { items: [...] }
+        $payload = $request->input('items');
+        if (!is_array($payload)) {
+            $payload = $request->json()->all();
+        }
+
+        // Normalizar a items:[...]
+        $dataWrap = ['items' => $payload];
+
+        $validator = Validator::make($dataWrap, [
+            'items'                 => ['required','array','min:1'],
+            'items.*.nombre'        => ['required','string','max:120'],
+            'items.*.descripcion'   => ['nullable','string'],
+            'items.*.categoria'     => ['required','string'],
+            'items.*.precio'        => ['required','numeric'],
+            'items.*.imagen'        => ['nullable','string'],
+            'items.*.disponible'    => ['boolean'],
+            'items.*.restaurant_id' => ['nullable','integer'],
+        ]);
+
+        $validator->validate();
+
+        $created = [];
+        foreach ($dataWrap['items'] as $row) {
+            $row['disponible']    = $row['disponible']    ?? true;
+            $row['restaurant_id'] = $row['restaurant_id'] ?? 1; // ajusta según tu contexto
+            $created[] = MenuItem::create($row);
+        }
+
+        return response()->json([
+            'message' => 'Ítems creados correctamente',
+            'count'   => count($created),
+            'data'    => $created,
+        ], 201);
     }
 
     /**
@@ -97,7 +186,8 @@ class MenuItemController extends Controller
      *       @OA\Property(property="categoria", type="string", example="bebida"),
      *       @OA\Property(property="precio", type="number", format="float", example=7.0),
      *       @OA\Property(property="imagen", type="string", nullable=true, example="limonada_2.jpg"),
-     *       @OA\Property(property="disponible", type="boolean", example=false)
+     *       @OA\Property(property="disponible", type="boolean", example=false),
+     *       @OA\Property(property="restaurant_id", type="integer", example=1)
      *     )
      *   ),
      *   @OA\Response(response=200, description="OK"),
@@ -110,12 +200,13 @@ class MenuItemController extends Controller
         $item = MenuItem::findOrFail($id);
 
         $data = $request->validate([
-            'nombre'      => ['sometimes','string','max:120'],
-            'descripcion' => ['sometimes','nullable','string'],
-            'categoria'   => ['sometimes','string'],
-            'precio'      => ['sometimes','numeric'],
-            'imagen'      => ['sometimes','nullable','string'],
-            'disponible'  => ['sometimes','boolean'],
+            'nombre'        => ['sometimes','string','max:120'],
+            'descripcion'   => ['sometimes','nullable','string'],
+            'categoria'     => ['sometimes','string'],
+            'precio'        => ['sometimes','numeric'],
+            'imagen'        => ['sometimes','nullable','string'],
+            'disponible'    => ['sometimes','boolean'],
+            'restaurant_id' => ['sometimes','integer'],
         ]);
 
         $item->update($data);

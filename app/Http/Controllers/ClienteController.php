@@ -70,45 +70,55 @@ class ClienteController extends Controller
         return $this->okData('Cliente encontrado', $c);
     }
 
-    /** @OA\Post(path="/api/clientes", operationId="ClientesStore", summary="Crear cliente", tags={"Clientes"}, @OA\RequestBody(required=true, @OA\JsonContent(type="object", required={"nombre_cliente","telefono"}, @OA\Property(property="nombre_cliente", type="string", example="Juan Pérez"), @OA\Property(property="telefono", type="string", example="3001234567"), @OA\Property(property="direccion", type="string", example="Calle 10 #5-20"))), @OA\Response(response=201, description="Creado"), @OA\Response(response=422, description="Datos inválidos")) */
-
-
-
-
-
+    /** @OA\Post(
+ *   path="/api/clientes",
+ *   tags={"Clientes"},
+ *   summary="Crear cliente",
+ *   @OA\RequestBody(
+ *     required=true,
+ *     @OA\JsonContent(
+ *       required={"nombre_cliente"},
+ *       @OA\Property(property="nombre_cliente", type="string", example="Juan Pérez"),
+ *       @OA\Property(property="telefono", type="string", example="3001234567"),
+ *       @OA\Property(property="direccion", type="string", example="Calle 10 #5-20"),
+ *       @OA\Property(property="restaurant_id", type="integer", example=1)
+ *     )
+ *   ),
+ *   @OA\Response(response=201, description="Creado"),
+ *   @OA\Response(response=422, description="Datos inválidos")
+ * )
+ */
 
 
     public function store(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'nombre_cliente'=>'required|string|max:255',
-            'telefono'      =>'nullable|string|max:50',
-            'direccion'     =>'nullable|string|max:255',
-        ]);
-        if (schema()->hasColumn('clientes','fecha_registro')) {
-            $data['fecha_registro'] = now();
-        }
-        $c = Cliente::create($data);
-        return $this->created('Cliente creado', $c);
-    }
+{
+    $data = $request->validate([
+        'nombre' => 'required|string|max:255',
+        'email'  => 'nullable|email|max:255',
+        'restaurant_id' => 'required|integer|exists:restaurants,id',
+    ]);
+
+    $cliente = Cliente::create($data);
+    return $this->created('Cliente creado correctamente', $cliente);
+}
+
 
     /** @OA\Put(path="/api/clientes/{id}", operationId="ClientesUpdate", summary="Actualizar cliente", tags={"Clientes"}, @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")), @OA\RequestBody(@OA\JsonContent(type="object", @OA\Property(property="nombre_cliente", type="string"), @OA\Property(property="telefono", type="string"), @OA\Property(property="direccion", type="string"))), @OA\Response(response=200, description="OK"), @OA\Response(response=404, description="No encontrado"), @OA\Response(response=422, description="Datos inválidos")) */
 
     public function update(Request $request, int $id): JsonResponse
-    {
-        $c = Cliente::find($id);
-        if (!$c) return $this->notFound();
+{
+    $cliente = Cliente::find($id);
+    if (!$cliente) return $this->notFound();
 
-        $data = $request->validate([
-            'nombre_cliente'=>'sometimes|required|string|max:255',
-            'telefono'      =>'sometimes|nullable|string|max:50',
-            'direccion'     =>'sometimes|nullable|string|max:255',
-        ]);
+    $data = $request->validate([
+        'nombre' => 'sometimes|required|string|max:255',
+        'email'  => 'sometimes|nullable|email|max:255',
+        'restaurant_id' => 'sometimes|required|integer|exists:restaurants,id',
+    ]);
 
-        $c->update($data);
-        return $this->okData('Cliente actualizado', $c);
-    }
-
+    $cliente->update($data);
+    return $this->okData('Cliente actualizado correctamente', $cliente);
+}
     /** @OA\Delete(path="/api/clientes/{id}", operationId="ClientesDestroy", summary="Eliminar cliente", tags={"Clientes"}, @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")), @OA\Response(response=200, description="Eliminado"), @OA\Response(response=404, description="No encontrado")) */
 
 

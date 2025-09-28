@@ -69,31 +69,29 @@ class UsuarioController extends Controller
      * )
      */
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'usuario'       => ['required','string','max:50','unique:usuarios,usuario'],
-            'password'      => ['required','string','min:6'],
-            'nombre'        => ['required','string','max:120'],
-            'apellido'      => ['nullable','string','max:120'],
-            'correo'        => ['required','email','max:180','unique:usuarios,correo'],
-            'rol'           => ['required','string'], // puedes usar Rule::in([...]) para restringir
-            'activo'        => ['boolean'],
-            'restaurant_id' => ['nullable','integer'],
-        ]);
+{
+    $data = $request->validate([
+        'usuario'       => ['required','string','max:50','unique:usuarios,usuario'],
+        'password'      => ['required','string','min:6'],
+        'nombre'        => ['required','string','max:120'],
+        'apellido'      => ['nullable','string','max:120'],
+        'correo'        => ['required','email','max:180','unique:usuarios,correo'],
+        'rol'           => ['required','in:admin,mesero,cocinero,cliente,empleado'],
+        'activo'        => ['boolean'],
+        // ⚠️ si tienes FK a restaurants(id):
+        'restaurant_id' => ['nullable','integer','exists:restaurants,id'],
+    ]);
 
-        $usuario = Usuario::create([
-            'usuario'       => $data['usuario'],
-            'password'      => $data['password'], // el mutator lo hashea
-            'nombre'        => $data['nombre'],
-            'apellido'      => $data['apellido'] ?? null,
-            'correo'        => $data['correo'],
-            'rol'           => $data['rol'],
-            'activo'        => $data['activo'] ?? true,
-            'restaurant_id' => $data['restaurant_id'] ?? 1,
-        ]);
+    // defaults seguros
+    $data['activo'] = $data['activo'] ?? true;
+    // si no envían restaurant_id, usa 1 (asegúrate que exista!)
+    $data['restaurant_id'] = $data['restaurant_id'] ?? 1;
 
-        return response()->json($usuario, 201);
-    }
+    // NO vuelvas a hacer bcrypt aquí: el mutator del modelo ya hashea
+    $usuario = Usuario::create($data);
+
+    return response()->json($usuario, 201);
+}
 
     /**
      * @OA\Put(

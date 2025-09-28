@@ -87,80 +87,61 @@ class PedidoController extends Controller
      * )
      */
     public function store(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'id_cliente' => 'required|integer|exists:clientes,id',
-            'mesa'       => 'nullable|string|max:50',
-            'estado'     => 'nullable|in:pendiente,en_entrega,listo,entregado,cancelado',
-            'items'      => 'required|array|min:1',
-            'items.*.id_menu_item'    => 'nullable|integer|exists:menu_items,id',
-            'items.*.nombre_producto' => 'required_without:items.*.id_menu_item|string|max:100',
-            'items.*.precio'          => 'required_without:items.*.id_menu_item|numeric|min:0',
-            'items.*.categoria'       => 'required_without:items.*.id_menu_item|string|max:50',
-            'items.*.cantidad'        => 'required|integer|min:1',
-            'items.*.descripcion'     => 'nullable|string',
-        ]);
+{
+    $data = $request->validate([
+        // usa cliente_id (como está en la BD)
+        'cliente_id'    => 'required|integer|exists:clientes,id',
+        // restaurant_id es NOT NULL en tu tabla: pásalo o define un default
+        'restaurant_id' => 'sometimes|integer|exists:restaurants,id',
+        'estado'        => 'sometimes|in:pendiente,en_entrega,listo,entregado,cancelado',
 
-        $pedido = Pedido::create([
-            'id_cliente' => $data['id_cliente'],
-            'mesa'       => $data['mesa'] ?? null,
-            'estado'     => $data['estado'] ?? 'pendiente',
-            'fecha'      => now(),
-        ]);
+        'items'   => 'required|array|min:1',
+        'items.*.id_menu_item'    => 'nullable|integer|exists:menu_items,id',
+        'items.*.nombre_producto' => 'required_without:items.*.id_menu_item|string|max:100',
+        'items.*.precio'          => 'required_without:items.*.id_menu_item|numeric|min:0',
+        'items.*.categoria'       => 'required_without:items.*.id_menu_item|string|max:50',
+        'items.*.cantidad'        => 'required|integer|min:1',
+        'items.*.descripcion'     => 'nullable|string',
+    ]);
 
-        foreach ($data['items'] as $it) {
-            // 1) Resolver datos del item
-            $nombre      = $it['nombre_producto'] ?? null;
-            $precio      = $it['precio'] ?? null;
-            $categoria   = $it['categoria'] ?? null;
-            $descripcion = $it['descripcion'] ?? null;
+    $pedido = Pedido::create([
+        'cliente_id'    => $data['cliente_id'],
+        'restaurant_id' => $data['restaurant_id'] ?? 1, // o el que corresponda
+        'estado'        => $data['estado'] ?? 'pendiente',
+        // NO guardamos mesa/fecha porque no existen en tu tabla
+    ]);
 
-            if (!empty($it['id_menu_item'])) {
-                $mi = MenuItem::find($it['id_menu_item']);
-                if ($mi) {
-                    $nombre      = $mi->nombre;
-                    $precio      = $mi->precio;
-                    $categoria   = $mi->categoria;
-                    $descripcion = $descripcion ?? $mi->descripcion;
-                }
-            }
+    foreach ($data['items'] as $it) {
+        $nombre      = $it['nombre_producto'] ?? null;
+        $precio      = $it['precio'] ?? null;
+        $categoria   = $it['categoria'] ?? null;
+        $descripcion = $it['descripcion'] ?? null;
 
-            // 2) Crear detalle del pedido
-            $detalle = DetallePedido::create([
-                'id_pedido'       => $pedido->id,
-                'nombre_producto' => $nombre,
-                'precio'          => $precio,
-                'cantidad'        => (int)$it['cantidad'],
-                'categoria'       => $categoria,
-                'descripcion'     => $descripcion,
-            ]);
-
-            // 3) Poblar tablas físicas según la categoría (opcional)
-            $cat = strtolower((string)$categoria);
-            if ($cat === 'plato') {
-                Plato::create([
-                    'id_pedido'       => $pedido->id,
-                    'id_detalle'      => $detalle->id ?? null,
-                    'nombre_producto' => $nombre,
-                    'precio'          => $precio,
-                    'cantidad'        => (int)$it['cantidad'],
-                    'descripcion'     => $descripcion,
-                ]);
-            } elseif ($cat === 'bebida') {
-                Bebida::create([
-                    'id_pedido'       => $pedido->id,
-                    'id_detalle'      => $detalle->id ?? null,
-                    'nombre_producto' => $nombre,
-                    'precio'          => $precio,
-                    'cantidad'        => (int)$it['cantidad'],
-                    'descripcion'     => $descripcion,
-                ]);
+        if (!empty($it['id_menu_item'])) {
+            $mi = MenuItem::find($it['id_menu_item']);
+            if ($mi) {
+                $nombre      = $mi->nombre;
+                $precio      = $mi->precio;
+                $categoria   = $mi->categoria;
+                $descripcion = $descripcion ?? $mi->descripcion;
             }
         }
 
-        $pedido = Pedido::with(['cliente','detalle'])->find($pedido->id);
-        return $this->created('Pedido creado', $pedido);
+        // usa pedido_id (como está en la FK)
+        DetallePedido::create([
+            'pedido_id'       => $pedido->id,
+            'nombre_producto' => $nombre,
+            'precio'          => $precio,
+            'cantidad'        => (int)$it['cantidad'],
+            'categoria'       => $categoria,      // asegúrate que existe esta columna
+            'descripcion'     => $descripcion,    // y esta si la quieres usar
+        ]);
     }
+
+    $pedido->load(['cliente','detalle']);
+
+    return $this->created('Pedido creado', $pedido);
+}
 
     /**
      * @OA\Put(

@@ -18,6 +18,7 @@ Route::get('/clientes/{id}', [ClienteController::class, 'show']);
 Route::post('/clientes', [ClienteController::class, 'store']);
 Route::put('/clientes/{id}', [ClienteController::class, 'update']);
 Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
+Route::apiResource('clientes', ClienteController::class);
 
 // Menú-Items
 Route::get('/menu-items', [MenuItemController::class, 'index']);
@@ -25,6 +26,8 @@ Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
 Route::post('/menu-items', [MenuItemController::class, 'store']);
 Route::put('/menu-items/{id}', [MenuItemController::class, 'update']);
 Route::delete('/menu-items/{id}', [MenuItemController::class, 'destroy']);
+Route::post('/menu-items/bulk', [MenuItemController::class, 'storeBulk']);
+
 
 // Menú
 Route::get('/menu/today', [MenuController::class, 'showToday']);

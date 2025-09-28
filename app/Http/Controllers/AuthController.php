@@ -11,7 +11,12 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            return $this->redirectForRole(Auth::user());
+            $user = Auth::user();
+            if (!$user instanceof \App\Models\Usuario) {
+                Auth::logout();
+                return redirect()->route('login')->withErrors(['usuario' => 'Usuario no válido.']);
+            }
+            return $this->redirectForRole($user);
         }
 
         return view('auth.login');
@@ -41,7 +46,12 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return $this->redirectForRole(Auth::user());
+        $user = Auth::user();
+        if (!$user instanceof \App\Models\Usuario) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors(['usuario' => 'Usuario no válido.']);
+        }
+        return $this->redirectForRole($user);
     }
 
 
@@ -70,4 +80,4 @@ class AuthController extends Controller
             default    => redirect()->route('cliente.panel'),
         };
     }
-
+}
