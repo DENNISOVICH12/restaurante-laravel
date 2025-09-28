@@ -10,11 +10,17 @@ class Pedido extends Model
     use BelongsToRestaurant;
     protected $table = 'pedidos';
     protected $primaryKey = 'id';
-    public $timestamps = false;
 
+    protected $fillable = ['cliente_id', 'estado'];
+
+    public function cliente()
+    {
+ return $this->belongsTo(\App\Models\Cliente::class, 'cliente_id'); 
+    }
     // columnas reales: id_cliente, fecha, estado, mesa
-    protected $fillable = ['id_cliente','fecha','estado','mesa'];
 
-    public function cliente() { return $this->belongsTo(\App\Models\Cliente::class, 'id_cliente'); }
-    public function detalle() { return $this->hasMany(\App\Models\DetallePedido::class, 'id_pedido'); }
+    public function detalle()
+    {
+        return $this->hasMany(\App\Models\DetallePedido::class, 'id_pedido');
+    }
 }
