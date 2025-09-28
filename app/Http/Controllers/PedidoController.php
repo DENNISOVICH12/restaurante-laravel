@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Pedido;
 use App\Models\DetallePedido;
 use App\Models\MenuItem;
-use App\Models\Plato;
-use App\Models\Bebida;
-use App\Http\Requests\PedidoStoreRequest;
+use App\Http\Requests\PedidoStoreRequest; 
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
+
 
 class PedidoController extends Controller
 {
@@ -32,16 +30,6 @@ class PedidoController extends Controller
      */
     public function index(Request $request)
     {
-        $q = Pedido::with('cliente')->orderBy('id', 'desc');
-
-        if ($estado = $request->query('estado')) {
-            $q->where('estado', $estado);
-        }
-
-        if ($clienteId = $request->query('id_cliente')) {
-            $q->where('id_cliente', $clienteId);
-        }
-
         $p = $q->paginate(10);
         $meta = [
             'current_page'=>$p->currentPage(),
@@ -78,7 +66,6 @@ class PedidoController extends Controller
      *   @OA\RequestBody(required=true,@OA\JsonContent(
      *     required={"id_cliente","items"},
      *     @OA\Property(property="id_cliente",type="integer",example=1),
-     *     @OA\Property(property="mesa",type="string",example="A3"),
      *     @OA\Property(property="estado",type="string",example="pendiente"),
      *     @OA\Property(property="items",type="array",
      *       @OA\Items(
@@ -99,12 +86,10 @@ class PedidoController extends Controller
     {
         $data = $request->validated();
 
-        $pedido = DB::transaction(function () use ($data) {
+         $pedido = DB::transaction(function () use ($data) {
             $pedido = Pedido::create([
-                'id_cliente' => $data['id_cliente'],
+                'cliente_id' => $data['id_cliente'],
                 'estado'     => $data['estado'] ?? 'pendiente',
-                'mesa'       => $data['mesa'] ?? null,
-                'fecha'      => Carbon::now(),
             ]);
 
             foreach ($data['items'] as $item) {
@@ -128,23 +113,22 @@ class PedidoController extends Controller
                 ]);
             }
 
-            return $pedido;
+             return $pedido; 
         });
 
-        $pedido->load(['cliente', 'detalle']);
+             $pedido->load(['cliente', 'detalle']);
 
-        return $this->created('Pedido creado', $pedido);
+ return $this->created('Solicitud creada', $pedido); 
     }
 
     /**
      * @OA\Put(
      *   path="/api/pedidos/{id}",
-     *   summary="Actualizar pedido (mesa/estado)",
+     *   summary="Actualizar pedido (estado)",
      *   tags={"Pedidos"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\RequestBody(@OA\JsonContent(
-     *     @OA\Property(property="mesa",type="string"),
-     *     @OA\Property(property="estado",type="string",enum={"pendiente","en_entrega","listo","entregado","cancelado"})
+   *     @OA\Property(property="estado",type="string",enum={"pendiente","en_entrega","listo","entregado","cancelado"})
      *   )),
      *   @OA\Response(response=200, description="OK"),
      *   @OA\Response(response=404, description="No encontrado"),
@@ -157,7 +141,6 @@ class PedidoController extends Controller
         if (!$pedido) return $this->notFound();
 
         $data = $request->validate([
-            'mesa'   => 'sometimes|nullable|string|max:50',
             'estado' => 'sometimes|in:pendiente,en_entrega,listo,entregado,cancelado',
         ]);
 
