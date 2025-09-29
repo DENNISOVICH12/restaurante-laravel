@@ -64,19 +64,38 @@ class PedidoController extends Controller
      *   summary="Crear pedido con items",
      *   tags={"Pedidos"},
      *   @OA\RequestBody(required=true,@OA\JsonContent(
-     *     required={"id_cliente","items"},
+     *     required={"id_cliente","items","restaurant_id"},
      *     @OA\Property(property="id_cliente",type="integer",example=1),
+     *     @OA\Property(property="restaurant_id",type="integer",example=1),
      *     @OA\Property(property="estado",type="string",example="pendiente"),
      *     @OA\Property(property="items",type="array",
      *       @OA\Items(
-     *         @OA\Property(property="id_menu_item",type="integer",example=2),
-     *         @OA\Property(property="nombre_producto",type="string",example="Limonada"),
-     *         @OA\Property(property="precio",type="number",format="float",example=5.5),
-     *         @OA\Property(property="categoria",type="string",example="bebida"),
+     *         @OA\Property(property="id_menu_item",type="integer",example=2,description="Opcional: completa el resto de campos automáticamente"),
+     *         @OA\Property(property="nombre_producto",type="string",example="Limonada",description="Requerido si no se envía id_menu_item"),
+     *         @OA\Property(property="precio",type="number",format="float",example=5500,description="Requerido si no se envía id_menu_item"),
+     *         @OA\Property(property="categoria",type="string",example="bebida",description="Requerido si no se envía id_menu_item"),
      *         @OA\Property(property="cantidad",type="integer",example=2),
      *         @OA\Property(property="descripcion",type="string",example="sin azúcar")
      *       )
-     *     )
+     *     ),
+     *     example={
+     *       "id_cliente"=1,
+     *       "restaurant_id"=1,
+     *       "estado"="pendiente",
+     *       "items"={
+     *         {
+     *           "id_menu_item"=2,
+     *           "cantidad"=2
+     *         },
+     *         {
+     *           "nombre_producto"="Ensalada César",
+     *           "precio"=18000,
+     *           "categoria"="entrada",
+     *           "cantidad"=1,
+     *           "descripcion"="sin aderezo"
+     *         }
+     *       }
+     *     }
      *   )),
      *   @OA\Response(response=201, description="Creado"),
      *   @OA\Response(response=422, description="Datos inválidos")
@@ -86,10 +105,11 @@ class PedidoController extends Controller
     {
         $data = $request->validated();
 
-         $pedido = DB::transaction(function () use ($data) {
+        $pedido = DB::transaction(function () use ($data) {
             $pedido = Pedido::create([
-                'cliente_id' => $data['id_cliente'],
-                'estado'     => $data['estado'] ?? 'pendiente',
+                'cliente_id'    => $data['id_cliente'],
+                'restaurant_id' => $data['restaurant_id'],
+                'estado'        => $data['estado'] ?? 'pendiente',
             ]);
 
             foreach ($data['items'] as $item) {
@@ -113,12 +133,12 @@ class PedidoController extends Controller
                 ]);
             }
 
-             return $pedido; 
+            return $pedido;
         });
 
-             $pedido->load(['cliente', 'detalle']);
+        $pedido->load(['cliente', 'detalle']);
 
- return $this->created('Solicitud creada', $pedido); 
+        return $this->created('Solicitud creada', $pedido);
     }
 
     /**
