@@ -11,7 +11,7 @@ class Pedido extends Model
     protected $table = 'pedidos';
     protected $primaryKey = 'id';
 
-    protected $fillable = ['cliente_id', 'estado'];
+    protected $fillable = ['cliente_id', 'restaurant_id', 'estado'];
 
     public function cliente()
     {
