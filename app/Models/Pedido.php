@@ -24,3 +24,4 @@ class Pedido extends Model
         return $this->hasMany(\App\Models\DetallePedido::class, 'id_pedido');
     }
 
+}
