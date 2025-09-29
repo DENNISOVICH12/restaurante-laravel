@@ -97,10 +97,9 @@ class PedidoController extends Controller
 
         $pedido = DB::transaction(function () use ($data) {
             $pedido = Pedido::create([
-
-                'cliente_id' => $data['id_cliente'],
+                'cliente_id'    => $data['cliente_id'],
                 'restaurant_id' => $data['restaurant_id'],
-                'estado'     => $data['estado'] ?? 'pendiente',
+                'estado'        => $data['estado'] ?? 'pendiente',
 
             ]);
 

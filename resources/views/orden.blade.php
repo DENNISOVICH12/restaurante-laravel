@@ -43,7 +43,7 @@
   <section id="menu" class="grid"></section>
 
   <div class="cart">
-    <div>Cliente ID: <input id="id_cliente" type="number" placeholder="Ej: 12" style="width:110px"></div>
+    <div>Cliente ID: <input id="cliente_id" type="number" placeholder="Ej: 12" style="width:110px"></div>
     <div>Mesa: <input id="mesa" type="text" value="{{ $mesa }}" placeholder="Ej: A1" style="width:80px"></div>
     <div>Total ítems: <strong id="total-items">0</strong></div>
     <button id="btn-ver-carrito" class="secondary">Ver carrito</button>
@@ -60,7 +60,7 @@
     const $btnVerCarrito = document.getElementById('btn-ver-carrito');
     const $mesaInput = document.getElementById('mesa');
     const $mesaTag = document.getElementById('mesa-tag');
-    const $idCliente = document.getElementById('id_cliente');
+    const $clienteId = document.getElementById('cliente_id');
 
     // Carrito simple en memoria
     const cart = []; // { id_menu_item, nombre, cantidad }
@@ -117,14 +117,14 @@
     });
 
     $btnEnviar.addEventListener('click', async ()=>{
-      const id_cliente = parseInt($idCliente.value,10);
+      const cliente_id = parseInt($clienteId.value,10);
       const mesa = $mesaInput.value.trim();
-      if (!id_cliente) return alert('Debes indicar el ID del cliente.');
+      if (!cliente_id) return alert('Debes indicar el ID del cliente.');
       if (!cart.length) return alert('El carrito está vacío.');
 
       // payload para tu POST /api/pedidos
       const payload = {
-        id_cliente,
+        cliente_id,
         mesa: mesa || null,
         items: cart.map(x=>({ id_menu_item: x.id_menu_item, cantidad: x.cantidad }))
       };

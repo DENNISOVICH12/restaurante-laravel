@@ -139,8 +139,8 @@ namespace App\Swagger;
  * @OA\Schema(
  *   schema="PedidoCreateRequest",
  *   type="object",
- *   required={"id_cliente","restaurant_id","items"},
- *   @OA\Property(property="id_cliente", type="integer", example=7),
+ *   required={"cliente_id","restaurant_id","items"},
+ *   @OA\Property(property="cliente_id", type="integer", example=7),
  *   @OA\Property(property="restaurant_id", type="integer", example=1),
  *   @OA\Property(property="estado", type="string", example="pendiente"),
  *   @OA\Property(
