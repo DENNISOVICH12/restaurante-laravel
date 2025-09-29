@@ -25,7 +25,11 @@ class PedidoController extends Controller
      *   operationId="PedidosIndex",
      *   summary="Lista de pedidos",
      *   tags={"Pedidos"},
-     *   @OA\Response(response=200, description="OK")
+     *   @OA\Response(
+     *     response=200,
+     *     description="Listado paginado",
+     *     @OA\JsonContent(ref="#/components/schemas/PedidoPaginatedResponse")
+     *   )
      * )
      */
     public function index(Request $request)
@@ -48,8 +52,16 @@ class PedidoController extends Controller
      *   summary="Ver pedido por ID",
      *   tags={"Pedidos"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="OK"),
-     *   @OA\Response(response=404, description="No encontrado")
+     *   @OA\Response(
+     *     response=200,
+     *     description="Pedido con detalle",
+     *     @OA\JsonContent(ref="#/components/schemas/PedidoDetailResponse")
+     *   ),
+     *   @OA\Response(
+     *     response=404,
+     *     description="No encontrado",
+     *     @OA\JsonContent(ref="#/components/schemas/ApiErrorResponse")
+     *   )
      * )
      */
     public function show(int $id): JsonResponse
@@ -64,26 +76,19 @@ class PedidoController extends Controller
      *   path="/api/pedidos",
      *   summary="Crear pedido con items",
      *   tags={"Pedidos"},
-     *   @OA\RequestBody(required=true,@OA\JsonContent(
-     *     required={"id_cliente","items","restaurant_id"},
-     *     @OA\Property(property="id_cliente",type="integer",example=1),
-     *     @OA\Property(property="restaurant_id",type="integer",example=1),
-     *     @OA\Property(property="estado",type="string",example="pendiente"),
-     *     @OA\Property(property="items",type="array",
-     *     @OA\Property(property="restaurant_id", type="integer", example=1)
-
-     *       @OA\Items(
-     *         @OA\Property(property="id_menu_item",type="integer",example=2),
-     *         @OA\Property(property="nombre_producto",type="string",example="Limonada"),
-     *         @OA\Property(property="precio",type="number",format="float",example=5.5),
-     *         @OA\Property(property="categoria",type="string",example="bebida"),
-     *         @OA\Property(property="cantidad",type="integer",example=2),
-     *         @OA\Property(property="descripcion",type="string",example="sin azúcar")
-     *       )
-     *     )
-     *   )),
-     *   @OA\Response(response=201, description="Creado"),
-     *   @OA\Response(response=422, description="Datos inválidos")
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref="#/components/schemas/PedidoCreateRequest")
+     *   ),
+     *   @OA\Response(
+     *     response=201,
+     *     description="Pedido creado",
+     *     @OA\JsonContent(ref="#/components/schemas/PedidoDetailResponse")
+     *   ),
+     *   @OA\Response(
+     *     response=422,
+     *     description="Datos inválidos"
+     *   )
      * )
      */
     public function store(PedidoStoreRequest $request): JsonResponse
@@ -125,7 +130,7 @@ class PedidoController extends Controller
 
         $pedido->load(['cliente', 'detalle']);
 
-        return $this->created('Solicitud creada', $pedido);
+        return $this->created('Pedido creado', $pedido);
     }
 
     /**
@@ -134,12 +139,24 @@ class PedidoController extends Controller
      *   summary="Actualizar pedido (estado)",
      *   tags={"Pedidos"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\RequestBody(@OA\JsonContent(
-   *     @OA\Property(property="estado",type="string",enum={"pendiente","en_entrega","listo","entregado","cancelado"})
-     *   )),
-     *   @OA\Response(response=200, description="OK"),
-     *   @OA\Response(response=404, description="No encontrado"),
-     *   @OA\Response(response=422, description="Datos inválidos")
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(ref="#/components/schemas/PedidoUpdateRequest")
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Pedido actualizado",
+     *     @OA\JsonContent(ref="#/components/schemas/PedidoDetailResponse")
+     *   ),
+     *   @OA\Response(
+     *     response=404,
+     *     description="No encontrado",
+     *     @OA\JsonContent(ref="#/components/schemas/ApiErrorResponse")
+     *   ),
+     *   @OA\Response(
+     *     response=422,
+     *     description="Datos inválidos"
+     *   )
      * )
      */
     public function update(Request $request, int $id): JsonResponse
@@ -162,8 +179,16 @@ class PedidoController extends Controller
      *   summary="Eliminar pedido",
      *   tags={"Pedidos"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Eliminado"),
-     *   @OA\Response(response=404, description="No encontrado")
+     *   @OA\Response(
+     *     response=200,
+     *     description="Eliminado",
+     *     @OA\JsonContent(ref="#/components/schemas/ApiMessageResponse")
+     *   ),
+     *   @OA\Response(
+     *     response=404,
+     *     description="No encontrado",
+     *     @OA\JsonContent(ref="#/components/schemas/ApiErrorResponse")
+     *   )
      * )
      */
     public function destroy(int $id): JsonResponse
@@ -182,8 +207,16 @@ class PedidoController extends Controller
      *   summary="Detalle del pedido",
      *   tags={"Pedidos - Detalle"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="OK"),
-     *   @OA\Response(response=404, description="No encontrado")
+     *   @OA\Response(
+     *     response=200,
+     *     description="Detalle listado",
+     *     @OA\JsonContent(ref="#/components/schemas/PedidoItemsResponse")
+     *   ),
+     *   @OA\Response(
+     *     response=404,
+     *     description="No encontrado",
+     *     @OA\JsonContent(ref="#/components/schemas/ApiErrorResponse")
+     *   )
      * )
      */
     public function detalle(int $id): JsonResponse
