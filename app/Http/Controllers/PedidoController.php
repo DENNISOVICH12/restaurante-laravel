@@ -65,8 +65,9 @@ class PedidoController extends Controller
      *   summary="Crear pedido con items",
      *   tags={"Pedidos"},
      *   @OA\RequestBody(required=true,@OA\JsonContent(
-     *     required={"id_cliente","items"},
+     *     required={"id_cliente","items","restaurant_id"},
      *     @OA\Property(property="id_cliente",type="integer",example=1),
+     *     @OA\Property(property="restaurant_id",type="integer",example=1),
      *     @OA\Property(property="estado",type="string",example="pendiente"),
      *     @OA\Property(property="items",type="array",
      *     @OA\Property(property="restaurant_id", type="integer", example=1)
@@ -89,11 +90,13 @@ class PedidoController extends Controller
     {
         $data = $request->validated();
 
-         $pedido = DB::transaction(function () use ($data) {
+        $pedido = DB::transaction(function () use ($data) {
             $pedido = Pedido::create([
+
                 'cliente_id' => $data['id_cliente'],
                 'estado'     => $data['estado'] ?? 'pendiente',
                 'restaurant_id' => $data['restaurant_id'],
+
             ]);
 
             foreach ($data['items'] as $item) {
@@ -117,12 +120,12 @@ class PedidoController extends Controller
                 ]);
             }
 
-             return $pedido; 
+            return $pedido;
         });
 
-             $pedido->load(['cliente', 'detalle']);
+        $pedido->load(['cliente', 'detalle']);
 
- return $this->created('Solicitud creada', $pedido); 
+        return $this->created('Solicitud creada', $pedido);
     }
 
     /**
