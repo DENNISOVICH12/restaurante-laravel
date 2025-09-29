@@ -94,8 +94,8 @@ class PedidoController extends Controller
             $pedido = Pedido::create([
 
                 'cliente_id' => $data['id_cliente'],
-                'estado'     => $data['estado'] ?? 'pendiente',
                 'restaurant_id' => $data['restaurant_id'],
+                'estado'     => $data['estado'] ?? 'pendiente',
 
             ]);
 
@@ -120,7 +120,7 @@ class PedidoController extends Controller
                 ]);
             }
 
-            return $pedido;
+             return $pedido;
         });
 
         $pedido->load(['cliente', 'detalle']);
