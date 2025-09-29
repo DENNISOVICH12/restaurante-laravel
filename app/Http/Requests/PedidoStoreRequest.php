@@ -11,6 +11,7 @@ class PedidoStoreRequest extends FormRequest
     {
         return [
             'id_cliente' => 'required|integer|exists:clientes,id',
+            'restaurant_id' => 'required|integer|exists:restaurants,id',
             'estado'     => 'nullable|in:pendiente,en_entrega,listo,entregado,cancelado',
             'items'      => 'required|array|min:1',
             // Aceptamos 2 formas:
