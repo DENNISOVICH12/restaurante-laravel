@@ -30,6 +30,7 @@ class PedidoController extends Controller
      */
     public function index(Request $request)
     {
+        $q = Pedido::query();
         $p = $q->paginate(10);
         $meta = [
             'current_page'=>$p->currentPage(),
@@ -68,6 +69,8 @@ class PedidoController extends Controller
      *     @OA\Property(property="id_cliente",type="integer",example=1),
      *     @OA\Property(property="estado",type="string",example="pendiente"),
      *     @OA\Property(property="items",type="array",
+     *     @OA\Property(property="restaurant_id", type="integer", example=1)
+
      *       @OA\Items(
      *         @OA\Property(property="id_menu_item",type="integer",example=2),
      *         @OA\Property(property="nombre_producto",type="string",example="Limonada"),
@@ -90,6 +93,7 @@ class PedidoController extends Controller
             $pedido = Pedido::create([
                 'cliente_id' => $data['id_cliente'],
                 'estado'     => $data['estado'] ?? 'pendiente',
+                'restaurant_id' => $data['restaurant_id'],
             ]);
 
             foreach ($data['items'] as $item) {
