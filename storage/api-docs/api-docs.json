@@ -527,11 +527,16 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "id_cliente",
+                                    "cliente_id",
+                                    "restaurant_id",
                                     "items"
                                 ],
                                 "properties": {
-                                    "id_cliente": {
+                                    "cliente_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "restaurant_id": {
                                         "type": "integer",
                                         "example": 1
                                     },
