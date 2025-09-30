@@ -27,6 +27,7 @@ namespace App\Swagger;
  *   @OA\Property(property="nombre_producto", type="string", example="Limonada"),
  *   @OA\Property(property="precio", type="number", format="float", example=5500),
  *   @OA\Property(property="categoria", type="string", example="bebida"),
+
  *   @OA\Property(property="cantidad", type="integer", example=2),
  *   @OA\Property(property="descripcion", type="string", nullable=true, example="Sin azúcar")
  * )
