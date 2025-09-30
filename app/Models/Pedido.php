@@ -11,13 +11,13 @@ class Pedido extends Model
     protected $table = 'pedidos';
     protected $primaryKey = 'id';
 
-    protected $fillable = ['cliente_id', 'estado'];
+    protected $fillable = ['cliente_id', 'restaurant_id', 'estado'];
 
     public function cliente()
     {
  return $this->belongsTo(\App\Models\Cliente::class, 'cliente_id'); 
     }
-    // columnas reales: id_cliente, fecha, estado, mesa
+    // columnas reales: cliente_id, restaurant_id, estado, created_at, updated_at
 
     public function detalle()
     {

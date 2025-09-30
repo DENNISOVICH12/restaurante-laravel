@@ -43,7 +43,7 @@
   <section id="menu" class="grid"></section>
 
   <div class="cart">
-    <div>Cliente ID: <input id="id_cliente" type="number" placeholder="Ej: 12" style="width:110px"></div>
+    <div>Cliente ID: <input id="cliente_id" type="number" placeholder="Ej: 12" style="width:110px"></div>
     <div>Mesa: <input id="mesa" type="text" value="{{ $mesa }}" placeholder="Ej: A1" style="width:80px"></div>
     <div>Total ítems: <strong id="total-items">0</strong></div>
     <button id="btn-ver-carrito" class="secondary">Ver carrito</button>
@@ -60,10 +60,10 @@
     const $btnVerCarrito = document.getElementById('btn-ver-carrito');
     const $mesaInput = document.getElementById('mesa');
     const $mesaTag = document.getElementById('mesa-tag');
-    const $idCliente = document.getElementById('id_cliente');
+    const $clienteId = document.getElementById('cliente_id');
 
     // Carrito simple en memoria
-    const cart = []; // { id_menu_item, nombre, cantidad }
+    const cart = []; // { id_menu_item, nombre, precio, categoria, descripcion, cantidad }
 
     function renderItems(items){
       $menu.innerHTML = '';
@@ -80,15 +80,24 @@
           <p class="muted">Categoría: ${it.categoria ?? '-'}</p>
           <p class="price">$ ${Number(it.precio).toFixed(2)}</p>
           <div class="row">
-            <button data-id="${it.id}" data-nombre="${it.nombre}">Agregar</button>
+            <button
+              data-id="${it.id}"
+              data-nombre="${it.nombre}"
+              data-precio="${it.precio}"
+              data-categoria="${it.categoria ?? ''}"
+              data-descripcion="${it.descripcion ?? ''}"
+            >Agregar</button>
           </div>
         `;
         card.querySelector('button').addEventListener('click', (e)=>{
           const id = parseInt(e.target.dataset.id,10);
           const nombre = e.target.dataset.nombre;
+          const precio = Number(e.target.dataset.precio ?? 0);
+          const categoria = e.target.dataset.categoria || '';
+          const descripcion = e.target.dataset.descripcion || null;
           const found = cart.find(x=>x.id_menu_item===id);
           if (found) found.cantidad += 1;
-          else cart.push({ id_menu_item: id, nombre, cantidad: 1 });
+          else cart.push({ id_menu_item: id, nombre, precio, categoria, descripcion, cantidad: 1 });
           $totalItems.textContent = cart.reduce((a,b)=>a+b.cantidad,0);
         });
         $menu.appendChild(card);
@@ -117,16 +126,22 @@
     });
 
     $btnEnviar.addEventListener('click', async ()=>{
-      const id_cliente = parseInt($idCliente.value,10);
+      const cliente_id = parseInt($clienteId.value,10);
       const mesa = $mesaInput.value.trim();
-      if (!id_cliente) return alert('Debes indicar el ID del cliente.');
+      if (!cliente_id) return alert('Debes indicar el ID del cliente.');
       if (!cart.length) return alert('El carrito está vacío.');
 
       // payload para tu POST /api/pedidos
       const payload = {
-        id_cliente,
+        cliente_id,
         mesa: mesa || null,
-        items: cart.map(x=>({ id_menu_item: x.id_menu_item, cantidad: x.cantidad }))
+        items: cart.map(x=>({
+          nombre_producto: x.nombre,
+          precio: x.precio,
+          categoria: x.categoria || 'sin_categoria',
+          cantidad: x.cantidad,
+          descripcion: x.descripcion || null,
+        }))
       };
 
       try{
