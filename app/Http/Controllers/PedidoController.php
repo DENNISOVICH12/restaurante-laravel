@@ -102,16 +102,20 @@ class PedidoController extends Controller
 
             ]);
 
-            foreach ($data['items'] as $item) {
-                DetallePedido::create([
-                    'id_pedido'       => $pedido->id,
-                    'nombre_producto' => $item['nombre_producto'],
-                    'precio'          => $item['precio'],
-                    'cantidad'        => (int) $item['cantidad'],
-                    'categoria'       => $item['categoria'],
-                    'descripcion'     => $item['descripcion'] ?? null,
-                ]);
-            }
+            // app/Http/Controllers/PedidoController.php
+foreach ($data['items'] as $item) {
+    $precioUnit = (float) $item['precio'];
+    $cant       = (int)   $item['cantidad'];
+
+    \App\Models\DetallePedido::create([
+        'pedido_id'     => $pedido->id,
+        'restaurant_id' => $data['restaurant_id'],
+        'menu_item_id'  => $item['menu_item_id'] ?? null,
+        'cantidad'      => $cant,
+        'precio_unitario'=> $precioUnit,
+        'importe'       => $precioUnit * $cant,
+    ]);
+}
 
              return $pedido;
         });

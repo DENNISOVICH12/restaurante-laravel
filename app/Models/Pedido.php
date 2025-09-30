@@ -15,13 +15,13 @@ class Pedido extends Model
 
     public function cliente()
     {
- return $this->belongsTo(\App\Models\Cliente::class, 'cliente_id'); 
+   return $this->belongsTo(\App\Models\Cliente::class, 'cliente_id'); 
     }
     // columnas reales: cliente_id, restaurant_id, estado, created_at, updated_at
 
     public function detalle()
     {
-        return $this->hasMany(\App\Models\DetallePedido::class, 'id_pedido');
+        return $this->hasMany(\App\Models\DetallePedido::class, 'pedido_id');
     }
 
 }
