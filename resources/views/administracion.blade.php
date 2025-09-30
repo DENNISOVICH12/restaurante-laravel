@@ -466,6 +466,22 @@
       if (el) el.textContent = (val ?? '—');
     };
 
+    const formatCurrency = (val) => {
+      const num = Number(val);
+      if (!Number.isFinite(num)) return '—';
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(num);
+    };
+
+    const labelEstado = (estado) => {
+      if (!estado) return '-';
+      return estado.replace(/_/g, ' ');
+    };
+
     try {
       const [usuarios, menu, pedidos] = await Promise.all([
         j('/api/usuarios?page=1'),
@@ -492,8 +508,8 @@
             <td>${row.id ?? ''}</td>
             <td>${row.cliente?.nombre_cliente ?? '-'}</td>
             <td>${row.mesa ?? '-'}</td>
-            <td><span class="badge ${badgeClass}">${estado || '-'}</span></td>
-            <td>${row.total ?? ''}</td>
+            <td><span class="badge ${badgeClass}">${labelEstado(row.estado)}</span></td>
+            <td>${formatCurrency(row.total)}</td>
           `;
           tbody.appendChild(tr);
         });
