@@ -483,11 +483,15 @@
     };
 
     try {
+
       const [usuariosRes, menuRes, pedidosRes] = await Promise.allSettled([
+
+
         j('/api/usuarios?page=1'),
         j('/api/menu-items?page=1'),
         j('/api/pedidos?page=1')
       ]);
+
 
       const usuarios = usuariosRes.status === 'fulfilled' ? usuariosRes.value : null;
       const menu     = menuRes.status     === 'fulfilled' ? menuRes.value     : null;
@@ -496,6 +500,7 @@
       if (!usuarios) console.warn('No se pudo cargar el total de usuarios');
       if (!menu) console.warn('No se pudo cargar el total de productos del menú');
       if (!pedidos) console.warn('No se pudo cargar el listado de pedidos');
+
 
       put('stat-usuarios', usuarios?.meta?.total ?? usuarios?.data?.length ?? '—');
       put('stat-menu',     menu?.meta?.total     ?? menu?.data?.length     ?? '—');
