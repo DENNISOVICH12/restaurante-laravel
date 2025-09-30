@@ -164,7 +164,19 @@ function showToast(msg){
 }
 
 function statusPill(estado){
+  if(!estado) return `<span class="status pendiente">-</span>`;
   return `<span class="status ${estado}">${estado.replace('_',' ')}</span>`;
+}
+
+function formatFecha(valor){
+  if(!valor) return '-';
+  try {
+    const date = new Date(valor);
+    if(Number.isNaN(date.getTime())) return valor;
+    return date.toLocaleString('es-CO', { hour12: false });
+  } catch (e) {
+    return valor;
+  }
 }
 
 async function loadPedidos(){
@@ -181,6 +193,7 @@ async function loadPedidos(){
     }
 
     items.forEach(p => {
+      const fecha = p.fecha ?? p.created_at ?? null;
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
@@ -191,7 +204,7 @@ async function loadPedidos(){
         <div class="muted">Cliente: ${p.cliente?.nombre_cliente ?? '-'}</div>
         <div class="row">
           <span class="pill">Mesa: ${p.mesa ?? '-'}</span>
-          <span class="pill">Fecha: ${p.fecha ?? '-'}</span>
+          <span class="pill">Fecha: ${fecha ? formatFecha(fecha) : '-'}</span>
         </div>
         <div class="row">
           <button class="btn primary" data-ver="${p.id}">Ver detalle</button>
@@ -235,20 +248,23 @@ async function openPedido(id){
     mStatus.textContent = (pedido.estado || '').replace('_',' ');
     mCliente.textContent = pedido.cliente?.nombre_cliente ?? '-';
     mMesa.textContent = pedido.mesa ?? '-';
-    mFecha.textContent = pedido.fecha ?? '-';
+    const fechaPedido = pedido.fecha ?? pedido.created_at ?? null;
+    mFecha.textContent = fechaPedido ? formatFecha(fechaPedido) : '-';
 
     // Render detalle
     let total = 0;
     mItems.innerHTML = (detalle || []).map(it=>{
       const cant = Number(it.cantidad || 0);
-      const precio = Number(it.precio || 0);
-      const sub = cant * precio;
+      const precioUnit = Number(it.precio ?? it.precio_unitario ?? 0);
+      const importe = Number(it.importe ?? it.subtotal ?? NaN);
+      const sub = Number.isFinite(importe) ? importe : cant * precioUnit;
+      const nombre = it.nombre_producto ?? it.nombre ?? it.menu_item?.nombre ?? '-';
       total += sub;
       return `
         <tr>
-          <td>${it.nombre_producto ?? '-'}</td>
+          <td>${nombre}</td>
           <td>${cant}</td>
-          <td>${precio.toFixed(2)}</td>
+          <td>${precioUnit.toFixed(2)}</td>
           <td>${sub.toFixed(2)}</td>
           <td>${it.descripcion ?? ''}</td>
         </tr>`;

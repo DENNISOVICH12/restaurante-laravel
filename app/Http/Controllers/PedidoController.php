@@ -33,8 +33,22 @@ class PedidoController extends Controller
      */
     public function index(Request $request)
     {
-        $q = Pedido::query();
-        $p = $q->paginate(10);
+        $q = Pedido::query()
+            ->with(['cliente' => function ($builder) {
+                $builder->select('id', 'nombre_cliente', 'telefono', 'direccion');
+            }])
+            ->withSum('detalle as importe_total', 'importe');
+
+        if ($estado = $request->query('estado')) {
+            $q->where('estado', $estado);
+        }
+
+        $perPage = (int) $request->query('per_page', 10);
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+        $p = $q->orderByDesc('created_at')->paginate($perPage);
         $meta = [
             'current_page'=>$p->currentPage(),
             'per_page'    =>$p->perPage(),
@@ -214,7 +228,7 @@ foreach ($data['items'] as $item) {
     public function detalle(int $id): JsonResponse
     {
         if (!Pedido::find($id)) return $this->notFound();
-        $items = DetallePedido::where('id_pedido',$id)->get();
+        $items = DetallePedido::where('pedido_id',$id)->get();
         return $this->okData('Detalle listado', $items);
     }
 }
