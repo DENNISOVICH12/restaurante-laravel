@@ -23,6 +23,7 @@
     .btn.primary{background:var(--primary);border-color:var(--primary);color:#031024}
     .btn.success{background:var(--success);border-color:var(--success);color:#031024}
     .btn.warn{background:var(--warn);border-color:var(--warn);color:#1a1200}
+    .filters .btn.active{background:var(--primary);border-color:var(--primary);color:#031024}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
     .card{background:var(--card);border:1px solid #1b2741;border-radius:14px;padding:14px;display:flex;gap:10px;flex-direction:column}
     .muted{color:var(--muted);font-size:13px}
@@ -123,6 +124,7 @@
 const API_BASE = '/api';
 const grid   = document.getElementById('grid');
 const empty  = document.getElementById('empty');
+const emptyDefault = empty ? empty.textContent : '';
 const toast  = document.getElementById('toast');
 
 const modal  = document.getElementById('modal');
@@ -138,16 +140,24 @@ const btnEnEntrega = document.getElementById('btn_enentrega');
 const btnEntregado = document.getElementById('btn_entregado');
 const btnImprimir  = document.getElementById('btn_imprimir');
 
-let currentEstado = 'listo';
+const filterButtons = Array.from(document.querySelectorAll('.filters .btn[data-f]'));
+let currentEstado = 'pendiente';
 let currentPedidoId = null;
 let csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-document.querySelectorAll('.filters .btn[data-f]').forEach(b=>{
+filterButtons.forEach(b=>{
   b.addEventListener('click', ()=>{
     currentEstado = b.dataset.f;
+    setActiveFilter();
     loadPedidos();
   });
 });
+
+function setActiveFilter(){
+  filterButtons.forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.f === currentEstado);
+  });
+}
 
 document.getElementById('reload').addEventListener('click', ()=> loadPedidos());
 
@@ -183,11 +193,15 @@ async function loadPedidos(){
   grid.innerHTML = '';
   empty.style.display = 'none';
   try{
-    const res = await fetch(`${API_BASE}/pedidos?estado=${encodeURIComponent(currentEstado)}`);
+    const res = await fetch(`${API_BASE}/pedidos?estado=${encodeURIComponent(currentEstado)}`, {
+      headers: { 'Accept': 'application/json' }
+    });
     const data = await res.json();
+    if(!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
     const items = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : []);
 
     if(!items.length){
+      empty.textContent = emptyDefault;
       empty.style.display = 'block';
       return;
     }
@@ -227,17 +241,24 @@ async function loadPedidos(){
   }catch(e){
     console.error(e);
     showToast('Error cargando pedidos');
+    if(empty){
+      empty.textContent = 'No se pudieron cargar los pedidos en este momento.';
+      empty.style.display = 'block';
+    }
   }
 }
 
 async function openPedido(id){
   try{
     const [pRes, dRes] = await Promise.all([
-      fetch(`${API_BASE}/pedidos/${id}`),
-      fetch(`${API_BASE}/pedidos/${id}/detalle`)
+      fetch(`${API_BASE}/pedidos/${id}`, { headers: { 'Accept': 'application/json' } }),
+      fetch(`${API_BASE}/pedidos/${id}/detalle`, { headers: { 'Accept': 'application/json' } })
     ]);
     const pdata = await pRes.json();
     const ddata = await dRes.json();
+
+    if(!pRes.ok) throw new Error(pdata?.message || `HTTP ${pRes.status}`);
+    if(!dRes.ok) throw new Error(ddata?.message || `HTTP ${dRes.status}`);
 
     const pedido = pdata.data ?? pdata;
     const detalle = ddata.data ?? ddata;
@@ -327,6 +348,7 @@ async function quickUpdate(id, nuevo){
 }
 
 // Carga inicial
+setActiveFilter();
 loadPedidos();
 </script>
 </body>

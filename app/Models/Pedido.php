@@ -12,7 +12,13 @@ class Pedido extends Model
     protected $table = 'pedidos';
     protected $primaryKey = 'id';
 
-    protected $fillable = ['cliente_id', 'restaurant_id', 'estado'];
+    protected $fillable = ['cliente_id', 'restaurant_id', 'mesa', 'estado'];
+
+    protected $appends = ['total', 'fecha'];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
 
     protected $appends = ['total', 'fecha'];
 

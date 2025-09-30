@@ -112,24 +112,24 @@ class PedidoController extends Controller
             $pedido = Pedido::create([
                 'cliente_id'    => $data['cliente_id'],
                 'restaurant_id' => $data['restaurant_id'],
+                'mesa'          => $data['mesa'] ?? null,
                 'estado'        => $data['estado'] ?? 'pendiente',
 
             ]);
 
-            // app/Http/Controllers/PedidoController.php
-foreach ($data['items'] as $item) {
-    $precioUnit = (float) $item['precio'];
-    $cant       = (int)   $item['cantidad'];
+            foreach ($data['items'] as $item) {
+                $precioUnit = (float) $item['precio'];
+                $cant       = (int) $item['cantidad'];
 
-    \App\Models\DetallePedido::create([
-        'pedido_id'     => $pedido->id,
-        'restaurant_id' => $data['restaurant_id'],
-        'menu_item_id'  => $item['menu_item_id'] ?? null,
-        'cantidad'      => $cant,
-        'precio_unitario'=> $precioUnit,
-        'importe'       => $precioUnit * $cant,
-    ]);
-}
+                \App\Models\DetallePedido::create([
+                    'pedido_id'      => $pedido->id,
+                    'restaurant_id'  => $data['restaurant_id'],
+                    'menu_item_id'   => $item['menu_item_id'] ?? null,
+                    'cantidad'       => $cant,
+                    'precio_unitario'=> $precioUnit,
+                    'importe'        => $precioUnit * $cant,
+                ]);
+            }
 
              return $pedido;
         });
@@ -171,6 +171,7 @@ foreach ($data['items'] as $item) {
         if (!$pedido) return $this->notFound();
 
         $data = $request->validate([
+            'mesa'   => 'sometimes|nullable|string|max:50',
             'estado' => 'sometimes|in:pendiente,en_entrega,listo,entregado,cancelado',
         ]);
 
