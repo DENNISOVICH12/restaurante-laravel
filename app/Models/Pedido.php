@@ -20,12 +20,6 @@ class Pedido extends Model
         'created_at' => 'datetime',
     ];
 
-    protected $appends = ['total', 'fecha'];
-
-    protected $casts = [
-        'created_at' => 'datetime',
-    ];
-
     public function cliente()
     {
         return $this->belongsTo(\App\Models\Cliente::class, 'cliente_id');

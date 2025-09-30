@@ -203,8 +203,10 @@ class PedidoController extends Controller
         $pedido = Pedido::find($id);
         if (!$pedido) return $this->notFound();
 
-        DetallePedido::where('id_pedido',$id)->delete();
-        $pedido->delete();
+        DB::transaction(function () use ($pedido) {
+            $pedido->detalle()->delete();
+            $pedido->delete();
+        });
         return $this->ok('Pedido eliminado');
     }
 
