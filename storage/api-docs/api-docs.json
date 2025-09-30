@@ -551,11 +551,13 @@
                                     "items": {
                                         "type": "array",
                                         "items": {
+                                            "required": [
+                                                "nombre_producto",
+                                                "precio",
+                                                "categoria",
+                                                "cantidad"
+                                            ],
                                             "properties": {
-                                                "id_menu_item": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                },
                                                 "nombre_producto": {
                                                     "type": "string",
                                                     "example": "Limonada"

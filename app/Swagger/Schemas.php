@@ -23,11 +23,11 @@ namespace App\Swagger;
  * @OA\Schema(
  *   schema="PedidoItemInput",
  *   type="object",
- *   required={"cantidad"},
- *   @OA\Property(property="id_menu_item", type="integer", nullable=true, example=12, description="ID del ítem del menú"),
- *   @OA\Property(property="nombre_producto", type="string", nullable=true, example="Limonada"),
- *   @OA\Property(property="precio", type="number", format="float", nullable=true, example=5500),
- *   @OA\Property(property="categoria", type="string", nullable=true, example="bebida"),
+ *   required={"nombre_producto","precio","categoria","cantidad"},
+ *   @OA\Property(property="nombre_producto", type="string", example="Limonada"),
+ *   @OA\Property(property="precio", type="number", format="float", example=5500),
+ *   @OA\Property(property="categoria", type="string", example="bebida"),
+
  *   @OA\Property(property="cantidad", type="integer", example=2),
  *   @OA\Property(property="descripcion", type="string", nullable=true, example="Sin azúcar")
  * )

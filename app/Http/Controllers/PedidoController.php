@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Pedido;
 use App\Models\DetallePedido;
-use App\Models\MenuItem;
 use App\Http\Requests\PedidoStoreRequest; 
 
 use Illuminate\Http\Request;
@@ -104,23 +103,13 @@ class PedidoController extends Controller
             ]);
 
             foreach ($data['items'] as $item) {
-                $menuItem = null;
-                if (!empty($item['id_menu_item'])) {
-                    $menuItem = MenuItem::find($item['id_menu_item']);
-                }
-
-                $nombre      = $menuItem->nombre ?? $item['nombre_producto'];
-                $precio      = $menuItem->precio ?? $item['precio'];
-                $categoria   = $menuItem->categoria ?? $item['categoria'];
-                $descripcion = $item['descripcion'] ?? ($menuItem->descripcion ?? null);
-
                 DetallePedido::create([
                     'id_pedido'       => $pedido->id,
-                    'nombre_producto' => $nombre,
-                    'precio'          => $precio,
+                    'nombre_producto' => $item['nombre_producto'],
+                    'precio'          => $item['precio'],
                     'cantidad'        => (int) $item['cantidad'],
-                    'categoria'       => $categoria,
-                    'descripcion'     => $descripcion,
+                    'categoria'       => $item['categoria'],
+                    'descripcion'     => $item['descripcion'] ?? null,
                 ]);
             }
 
