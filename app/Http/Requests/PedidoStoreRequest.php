@@ -27,16 +27,17 @@ class PedidoStoreRequest extends FormRequest
     public function authorize(): bool { return true; }
     public function rules(): array
     {
-         return [
-        'cliente_id'    => 'required|integer|exists:clientes,id',
-        'restaurant_id' => 'required|integer|exists:restaurants,id',
-        'estado'        => 'nullable|in:pendiente,en_entrega,listo,entregado,cancelado',
-        'items'         => 'required|array|min:1',
+        return [
+            'cliente_id'          => 'required|integer|exists:clientes,id',
+            'restaurant_id'       => 'required|integer|exists:restaurants,id',
+            'mesa'                => 'nullable|string|max:50',
+            'estado'              => 'nullable|in:pendiente,en_entrega,listo,entregado,cancelado',
+            'items'               => 'required|array|min:1',
 
-        // opción A: usar menu_item_id
-        'items.*.menu_item_id' => 'required|integer|exists:menu_items,id',
-        'items.*.cantidad'     => 'required|integer|min:1',
-        'items.*.precio'       => 'required|numeric|min:0', // precio unitario recibido
-    ];
+            // opción A: usar menu_item_id
+            'items.*.menu_item_id'=> 'required|integer|exists:menu_items,id',
+            'items.*.cantidad'    => 'required|integer|min:1',
+            'items.*.precio'      => 'required|numeric|min:0', // precio unitario recibido
+        ];
     }
 }
