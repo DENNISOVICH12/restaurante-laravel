@@ -33,8 +33,22 @@ class PedidoController extends Controller
      */
     public function index(Request $request)
     {
-        $q = Pedido::query();
-        $p = $q->paginate(10);
+        $q = Pedido::query()
+            ->with(['cliente' => function ($builder) {
+                $builder->select('id', 'nombre_cliente', 'telefono', 'direccion');
+            }])
+            ->withSum('detalle as importe_total', 'importe');
+
+        if ($estado = $request->query('estado')) {
+            $q->where('estado', $estado);
+        }
+
+        $perPage = (int) $request->query('per_page', 10);
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
+        $p = $q->orderByDesc('created_at')->paginate($perPage);
         $meta = [
             'current_page'=>$p->currentPage(),
             'per_page'    =>$p->perPage(),
@@ -98,24 +112,24 @@ class PedidoController extends Controller
             $pedido = Pedido::create([
                 'cliente_id'    => $data['cliente_id'],
                 'restaurant_id' => $data['restaurant_id'],
+                'mesa'          => $data['mesa'] ?? null,
                 'estado'        => $data['estado'] ?? 'pendiente',
 
             ]);
 
-            // app/Http/Controllers/PedidoController.php
-foreach ($data['items'] as $item) {
-    $precioUnit = (float) $item['precio'];
-    $cant       = (int)   $item['cantidad'];
+            foreach ($data['items'] as $item) {
+                $precioUnit = (float) $item['precio'];
+                $cant       = (int) $item['cantidad'];
 
-    \App\Models\DetallePedido::create([
-        'pedido_id'     => $pedido->id,
-        'restaurant_id' => $data['restaurant_id'],
-        'menu_item_id'  => $item['menu_item_id'] ?? null,
-        'cantidad'      => $cant,
-        'precio_unitario'=> $precioUnit,
-        'importe'       => $precioUnit * $cant,
-    ]);
-}
+                \App\Models\DetallePedido::create([
+                    'pedido_id'      => $pedido->id,
+                    'restaurant_id'  => $data['restaurant_id'],
+                    'menu_item_id'   => $item['menu_item_id'] ?? null,
+                    'cantidad'       => $cant,
+                    'precio_unitario'=> $precioUnit,
+                    'importe'        => $precioUnit * $cant,
+                ]);
+            }
 
              return $pedido;
         });
@@ -157,6 +171,7 @@ foreach ($data['items'] as $item) {
         if (!$pedido) return $this->notFound();
 
         $data = $request->validate([
+            'mesa'   => 'sometimes|nullable|string|max:50',
             'estado' => 'sometimes|in:pendiente,en_entrega,listo,entregado,cancelado',
         ]);
 
@@ -214,7 +229,7 @@ foreach ($data['items'] as $item) {
     public function detalle(int $id): JsonResponse
     {
         if (!Pedido::find($id)) return $this->notFound();
-        $items = DetallePedido::where('id_pedido',$id)->get();
+        $items = DetallePedido::where('pedido_id',$id)->get();
         return $this->okData('Detalle listado', $items);
     }
 }
