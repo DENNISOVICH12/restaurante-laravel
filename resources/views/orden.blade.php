@@ -63,7 +63,7 @@
     const $clienteId = document.getElementById('cliente_id');
 
     // Carrito simple en memoria
-    const cart = []; // { id_menu_item, nombre, precio, categoria, descripcion, cantidad }
+    const cart = []; // { menu_item_id, nombre, precio, categoria, descripcion, cantidad }
 
     function renderItems(items){
       $menu.innerHTML = '';
@@ -95,9 +95,9 @@
           const precio = Number(e.target.dataset.precio ?? 0);
           const categoria = e.target.dataset.categoria || '';
           const descripcion = e.target.dataset.descripcion || null;
-          const found = cart.find(x=>x.id_menu_item===id);
+          const found = cart.find(x=>x.menu_item_id===id);
           if (found) found.cantidad += 1;
-          else cart.push({ id_menu_item: id, nombre, precio, categoria, descripcion, cantidad: 1 });
+          else cart.push({ menu_item_id: id, nombre, precio, categoria, descripcion, cantidad: 1 });
           $totalItems.textContent = cart.reduce((a,b)=>a+b.cantidad,0);
         });
         $menu.appendChild(card);
@@ -136,11 +136,9 @@
         cliente_id,
         mesa: mesa || null,
         items: cart.map(x=>({
-          nombre_producto: x.nombre,
-          precio: x.precio,
-          categoria: x.categoria || 'sin_categoria',
+          menu_item_id: x.menu_item_id,
           cantidad: x.cantidad,
-          descripcion: x.descripcion || null,
+          precio: x.precio,
         }))
       };
 
@@ -152,7 +150,9 @@
         });
         const json = await res.json();
         if (!res.ok){
-          return alert('Error: '+(json.message || JSON.stringify(json)));
+          const validation = json?.errors ? Object.values(json.errors).flat().join('\n') : null;
+          const message = validation || json.message || JSON.stringify(json);
+          return alert('Error: '+message);
         }
         cart.length = 0;
         $totalItems.textContent = '0';
