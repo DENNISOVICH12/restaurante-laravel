@@ -22,9 +22,7 @@
       --radius: 22px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -68,9 +66,7 @@
       letter-spacing: 0.6px;
     }
 
-    .brand span {
-      display: block;
-    }
+    .brand span { display: block; }
 
     .user {
       font-size: clamp(16px, 2.3vw, 20px);
@@ -148,9 +144,7 @@
       box-shadow: 0 16px 30px rgba(17, 42, 67, 0.18);
     }
 
-    .action-card span.emoji {
-      font-size: 34px;
-    }
+    .action-card span.emoji { font-size: 34px; }
 
     .section-title {
       display: flex;
@@ -217,10 +211,7 @@
       font-size: 15px;
     }
 
-    .card a.btn {
-      margin-top: 8px;
-      justify-self: start;
-    }
+    .card a.btn { margin-top: 8px; justify-self: start; }
 
     .grid-two {
       display: grid;
@@ -235,8 +226,7 @@
       font-size: 15px;
     }
 
-    th,
-    td {
+    th, td {
       padding: 12px 10px;
       text-align: left;
       border-bottom: 1px solid rgba(16, 42, 67, 0.08);
@@ -309,22 +299,12 @@
       font-weight: 600;
     }
 
-    .hint-box span {
-      font-size: 28px;
-    }
+    .hint-box span { font-size: 28px; }
 
     @media (max-width: 720px) {
-      body {
-        padding: 16px;
-      }
-
-      header {
-        padding: 26px 22px;
-      }
-
-      .content {
-        padding: 26px 22px 32px;
-      }
+      body { padding: 16px; }
+      header { padding: 26px 22px; }
+      .content { padding: 26px 22px 32px; }
     }
   </style>
 </head>
@@ -467,73 +447,3 @@
     };
 
     const formatCurrency = (val) => {
-      const num = Number(val);
-      if (!Number.isFinite(num)) return '—';
-      return new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(num);
-    };
-
-    const labelEstado = (estado) => {
-      if (!estado) return '-';
-      return estado.replace(/_/g, ' ');
-    };
-
-    try {
-      const [usuariosRes, menuRes, pedidosRes] = await Promise.allSettled([
-        j('/api/usuarios?page=1'),
-        j('/api/menu-items?page=1'),
-        j('/api/pedidos?page=1')
-      ]);
-
-      const usuarios = usuariosRes.status === 'fulfilled' ? usuariosRes.value : null;
-      const menu     = menuRes.status     === 'fulfilled' ? menuRes.value     : null;
-      const pedidos  = pedidosRes.status  === 'fulfilled' ? pedidosRes.value  : null;
-
-      if (!usuarios) console.warn('No se pudo cargar el total de usuarios');
-      if (!menu) console.warn('No se pudo cargar el total de productos del menú');
-      if (!pedidos) console.warn('No se pudo cargar el listado de pedidos');
-
-      put('stat-usuarios', usuarios?.meta?.total ?? usuarios?.data?.length ?? '—');
-      put('stat-menu',     menu?.meta?.total     ?? menu?.data?.length     ?? '—');
-      put('stat-pedidos',  pedidos?.meta?.total  ?? pedidos?.data?.length  ?? '—');
-
-      const tbody = document.getElementById('tbody-pedidos');
-      if (tbody) {
-        tbody.innerHTML = '';
-
-        const pedidosData = Array.isArray(pedidos?.data) ? pedidos.data : (Array.isArray(pedidos) ? pedidos : []);
-
-        if (!pedidosData.length) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#6b7280;">No hay pedidos recientes para mostrar.</td></tr>';
-          return;
-        }
-
-        pedidosData.slice(0, 5).forEach(row => {
-          const estado = String(row.estado || '').toLowerCase();
-          const badgeClass =
-            estado === 'entregado'  ? 'b-ok'  :
-            estado === 'en_entrega' ? 'b-warn':
-            estado ? 'b-bad' : '';
-
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${row.id ?? ''}</td>
-            <td>${row.cliente?.nombre_cliente ?? '-'}</td>
-            <td>${row.mesa ?? '-'}</td>
-            <td><span class="badge ${badgeClass}">${labelEstado(row.estado)}</span></td>
-            <td>${formatCurrency(row.total)}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-    } catch (e) {
-      console.error('Error cargando panel admin:', e);
-    }
-  })();
-  </script>
-</body>
-</html>
