@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Concerns\BelongsToRestaurant;
 
 class MenuItem extends Model
 {
+    use HasFactory;
     use BelongsToRestaurant;
     protected $table = 'menu_items'; // cambia si tu tabla se llama distinto
 
