@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Restaurant;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PedidoStoreRequest extends FormRequest
@@ -14,10 +15,22 @@ class PedidoStoreRequest extends FormRequest
             $input['cliente_id'] = $input['id_cliente'];
         }
 
-        if (!array_key_exists('restaurant_id', $input) && app()->bound('current_restaurant_id')) {
-            $restaurantId = app('current_restaurant_id');
+        if (!array_key_exists('restaurant_id', $input)) {
+            $restaurantId = $this->attributes->get('restaurant_id');
+
+            if (!$restaurantId && app()->bound('current_restaurant_id')) {
+                $restaurantId = app('current_restaurant_id');
+            }
+
+            if (!$restaurantId) {
+                $candidateIds = Restaurant::query()->limit(2)->pluck('id');
+                if ($candidateIds->count() === 1) {
+                    $restaurantId = $candidateIds->first();
+                }
+            }
+
             if ($restaurantId) {
-                $input['restaurant_id'] = $restaurantId;
+                $input['restaurant_id'] = (int) $restaurantId;
             }
         }
 

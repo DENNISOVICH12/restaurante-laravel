@@ -66,3 +66,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 ## Guía de pruebas y evidencia
 
 Para un instructivo paso a paso sobre cómo ejecutar las pruebas automatizadas (caja negra y caja blanca) y cómo capturar la evidencia necesaria, consulta [`docs/testing-evidence.md`](docs/testing-evidence.md).
+
+## Ejecución de migraciones
+
+Si necesitas recordar los pasos para correr `php artisan migrate`, revisa la guía detallada en [`docs/migration-guide.md`](docs/migration-guide.md).
