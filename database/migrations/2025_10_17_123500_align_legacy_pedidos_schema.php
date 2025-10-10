@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+
+use Illuminate\Database\QueryException;
+
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -8,15 +11,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        if (Schema::hasTable('detalle_pedido') && !Schema::hasTable('pedido_detalles')) {
+
+        if ($this->hasTable('detalle_pedido') && !$this->hasTable('pedido_detalles')) {
             Schema::rename('detalle_pedido', 'pedido_detalles');
         }
 
-        if (Schema::hasTable('pedidos')) {
-            $hasRestaurants = Schema::hasTable('restaurants');
-            $hasClientes    = Schema::hasTable('clientes');
+        if ($this->hasTable('pedidos')) {
+            $hasRestaurants = $this->hasTable('restaurants');
+            $hasClientes    = $this->hasTable('clientes');
 
-            if (!Schema::hasColumn('pedidos', 'restaurant_id')) {
+            if (!$this->hasColumn('pedidos', 'restaurant_id')) {
+
                 Schema::table('pedidos', function (Blueprint $table) use ($hasRestaurants) {
                     if ($hasRestaurants) {
                         $table->foreignId('restaurant_id')
@@ -30,7 +35,8 @@ return new class extends Migration {
                 });
             }
 
-            if (!Schema::hasColumn('pedidos', 'cliente_id')) {
+            if (!$this->hasColumn('pedidos', 'cliente_id')) {
+
                 Schema::table('pedidos', function (Blueprint $table) use ($hasClientes) {
                     if ($hasClientes) {
                         $table->foreignId('cliente_id')
@@ -44,32 +50,42 @@ return new class extends Migration {
                 });
             }
 
-            if (!Schema::hasColumn('pedidos', 'estado')) {
+
+            if (!$this->hasColumn('pedidos', 'estado')) {
+
                 Schema::table('pedidos', function (Blueprint $table) {
                     $table->string('estado')->default('pendiente')->after('cliente_id');
                 });
             }
 
-            if (!Schema::hasColumn('pedidos', 'created_at')) {
+
+            if (!$this->hasColumn('pedidos', 'created_at')) {
+
                 Schema::table('pedidos', function (Blueprint $table) {
                     $table->timestamp('created_at')->nullable()->after('estado');
                     $table->timestamp('updated_at')->nullable()->after('created_at');
                 });
             }
 
-            if (Schema::hasColumn('pedidos', 'id_cliente')) {
+
+            if ($this->hasColumn('pedidos', 'id_cliente')) {
+
                 DB::table('pedidos')->whereNull('cliente_id')->update([
                     'cliente_id' => DB::raw('id_cliente'),
                 ]);
             }
 
-            if (Schema::hasColumn('pedidos', 'fecha') && Schema::hasColumn('pedidos', 'created_at')) {
+
+            if ($this->hasColumn('pedidos', 'fecha') && $this->hasColumn('pedidos', 'created_at')) {
+
                 DB::table('pedidos')->whereNull('created_at')->update([
                     'created_at' => DB::raw('fecha'),
                 ]);
             }
 
-            if (Schema::hasColumn('pedidos', 'restaurant_id') && Schema::hasTable('restaurants')) {
+
+            if ($this->hasColumn('pedidos', 'restaurant_id') && $this->hasTable('restaurants')) {
+
                 $defaultRestaurant = DB::table('restaurants')->orderBy('id')->value('id');
                 if ($defaultRestaurant) {
                     DB::table('pedidos')->whereNull('restaurant_id')->update([
@@ -79,11 +95,13 @@ return new class extends Migration {
             }
         }
 
-        if (Schema::hasTable('pedido_detalles')) {
-            $hasRestaurants = Schema::hasTable('restaurants');
-            $hasMenuItems   = Schema::hasTable('menu_items');
 
-            if (!Schema::hasColumn('pedido_detalles', 'restaurant_id')) {
+        if ($this->hasTable('pedido_detalles')) {
+            $hasRestaurants = $this->hasTable('restaurants');
+            $hasMenuItems   = $this->hasTable('menu_items');
+
+            if (!$this->hasColumn('pedido_detalles', 'restaurant_id')) {
+
                 Schema::table('pedido_detalles', function (Blueprint $table) use ($hasRestaurants) {
                     if ($hasRestaurants) {
                         $table->foreignId('restaurant_id')
@@ -97,13 +115,17 @@ return new class extends Migration {
                 });
             }
 
-            if (!Schema::hasColumn('pedido_detalles', 'pedido_id')) {
+
+            if (!$this->hasColumn('pedido_detalles', 'pedido_id')) {
+
                 Schema::table('pedido_detalles', function (Blueprint $table) {
                     $table->unsignedBigInteger('pedido_id')->nullable()->after('restaurant_id');
                 });
             }
 
-            if (!Schema::hasColumn('pedido_detalles', 'menu_item_id')) {
+
+            if (!$this->hasColumn('pedido_detalles', 'menu_item_id')) {
+
                 Schema::table('pedido_detalles', function (Blueprint $table) use ($hasMenuItems) {
                     if ($hasMenuItems) {
                         $table->foreignId('menu_item_id')
@@ -117,32 +139,39 @@ return new class extends Migration {
                 });
             }
 
-            if (!Schema::hasColumn('pedido_detalles', 'precio_unitario')) {
+
+            if (!$this->hasColumn('pedido_detalles', 'precio_unitario')) {
+
                 Schema::table('pedido_detalles', function (Blueprint $table) {
                     $table->decimal('precio_unitario', 10, 2)->default(0)->after('cantidad');
                 });
             }
 
-            if (!Schema::hasColumn('pedido_detalles', 'importe')) {
+
+            if (!$this->hasColumn('pedido_detalles', 'importe')) {
+
                 Schema::table('pedido_detalles', function (Blueprint $table) {
                     $table->decimal('importe', 10, 2)->default(0)->after('precio_unitario');
                 });
             }
 
-            if (!Schema::hasColumn('pedido_detalles', 'created_at')) {
+            if (!$this->hasColumn('pedido_detalles', 'created_at')) {
+
                 Schema::table('pedido_detalles', function (Blueprint $table) {
                     $table->timestamp('created_at')->nullable()->after('importe');
                     $table->timestamp('updated_at')->nullable()->after('created_at');
                 });
             }
 
-            if (Schema::hasColumn('pedido_detalles', 'id_pedido')) {
+            if ($this->hasColumn('pedido_detalles', 'id_pedido')) {
+
                 DB::table('pedido_detalles')->whereNull('pedido_id')->update([
                     'pedido_id' => DB::raw('id_pedido'),
                 ]);
             }
 
-            if (Schema::hasColumn('pedido_detalles', 'precio')) {
+            if ($this->hasColumn('pedido_detalles', 'precio')) {
+
                 DB::table('pedido_detalles')->whereNull('precio_unitario')->update([
                     'precio_unitario' => DB::raw('precio'),
                 ]);
@@ -151,7 +180,8 @@ return new class extends Migration {
                 ]);
             }
 
-            if (Schema::hasColumn('pedido_detalles', 'restaurant_id') && Schema::hasColumn('pedido_detalles', 'pedido_id')) {
+            if ($this->hasColumn('pedido_detalles', 'restaurant_id') && $this->hasColumn('pedido_detalles', 'pedido_id')) {
+
                 $defaults = DB::table('pedidos')
                     ->select('id', 'restaurant_id')
                     ->whereNotNull('restaurant_id')
@@ -173,4 +203,81 @@ return new class extends Migration {
     {
         // Intentionally left blank: reverting could drop datos existentes.
     }
+
+    private function hasTable(string $table): bool
+    {
+        try {
+            return Schema::hasTable($table);
+        } catch (QueryException $e) {
+            return $this->retryHasTable($table, $e);
+        }
+    }
+
+    private function hasColumn(string $table, string $column): bool
+    {
+        try {
+            return Schema::hasColumn($table, $column);
+        } catch (QueryException $e) {
+            return $this->retryHasColumn($table, $column, $e);
+        }
+    }
+
+    private function retryHasTable(string $table, QueryException $exception): bool
+    {
+        $connection = Schema::getConnection();
+        $driver     = $connection->getDriverName();
+
+        if ($driver === 'sqlite') {
+            $result = $connection->select(
+                "select name from sqlite_master where type = 'table' and name = ?",
+                [$table]
+            );
+
+            return !empty($result);
+        }
+
+        if ($driver === 'sqlsrv') {
+            $result = $connection->select(
+                'select [name] from sys.tables where [name] = ?',
+                [$table]
+            );
+
+            return !empty($result);
+        }
+
+        throw $exception;
+    }
+
+    private function retryHasColumn(string $table, string $column, QueryException $exception): bool
+    {
+        $connection = Schema::getConnection();
+        $driver     = $connection->getDriverName();
+
+        if ($driver === 'sqlite') {
+            $escapedTable = str_replace("'", "''", $table);
+            $result       = $connection->select(
+                "pragma table_info('{$escapedTable}')"
+            );
+
+            foreach ($result as $definition) {
+                if (($definition->name ?? null) === $column) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if ($driver === 'sqlsrv') {
+            $result = $connection->select(
+                'select [name] from sys.columns where [object_id] = object_id(?) and [name] = ?',
+                [$table, $column]
+            );
+
+            return !empty($result);
+        }
+
+        throw $exception;
+    }
+
 };
