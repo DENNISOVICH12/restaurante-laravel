@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-
 use Illuminate\Database\QueryException;
+
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        $this->ensurePdoDriver();
+
 
         if ($this->hasTable('detalle_pedido') && !$this->hasTable('pedido_detalles')) {
             Schema::rename('detalle_pedido', 'pedido_detalles');
@@ -50,14 +52,12 @@ return new class extends Migration {
                 });
             }
 
-
             if (!$this->hasColumn('pedidos', 'estado')) {
 
                 Schema::table('pedidos', function (Blueprint $table) {
                     $table->string('estado')->default('pendiente')->after('cliente_id');
                 });
             }
-
 
             if (!$this->hasColumn('pedidos', 'created_at')) {
 
@@ -67,7 +67,6 @@ return new class extends Migration {
                 });
             }
 
-
             if ($this->hasColumn('pedidos', 'id_cliente')) {
 
                 DB::table('pedidos')->whereNull('cliente_id')->update([
@@ -75,14 +74,12 @@ return new class extends Migration {
                 ]);
             }
 
-
             if ($this->hasColumn('pedidos', 'fecha') && $this->hasColumn('pedidos', 'created_at')) {
 
                 DB::table('pedidos')->whereNull('created_at')->update([
                     'created_at' => DB::raw('fecha'),
                 ]);
             }
-
 
             if ($this->hasColumn('pedidos', 'restaurant_id') && $this->hasTable('restaurants')) {
 
@@ -115,14 +112,12 @@ return new class extends Migration {
                 });
             }
 
-
             if (!$this->hasColumn('pedido_detalles', 'pedido_id')) {
 
                 Schema::table('pedido_detalles', function (Blueprint $table) {
                     $table->unsignedBigInteger('pedido_id')->nullable()->after('restaurant_id');
                 });
             }
-
 
             if (!$this->hasColumn('pedido_detalles', 'menu_item_id')) {
 
@@ -139,14 +134,12 @@ return new class extends Migration {
                 });
             }
 
-
             if (!$this->hasColumn('pedido_detalles', 'precio_unitario')) {
 
                 Schema::table('pedido_detalles', function (Blueprint $table) {
                     $table->decimal('precio_unitario', 10, 2)->default(0)->after('cantidad');
                 });
             }
-
 
             if (!$this->hasColumn('pedido_detalles', 'importe')) {
 
@@ -278,6 +271,35 @@ return new class extends Migration {
         }
 
         throw $exception;
+    }
+
+
+    private function ensurePdoDriver(): void
+    {
+        $connectionName = config('database.default');
+        $driver         = config("database.connections.{$connectionName}.driver");
+
+        if (!$driver) {
+            return;
+        }
+
+        $extension = [
+            'mysql'  => 'pdo_mysql',
+            'pgsql'  => 'pdo_pgsql',
+            'sqlsrv' => 'pdo_sqlsrv',
+            'sqlite' => 'pdo_sqlite',
+        ][$driver] ?? null;
+
+        if ($extension && !extension_loaded($extension)) {
+            throw new \RuntimeException(
+                sprintf(
+                    'La conexión "%s" requiere la extensión PHP "%s". Instálala y vuelve a ejecutar php artisan migrate. '
+                    . 'Consulta docs/migration-guide.md para ver los paquetes recomendados por sistema operativo.',
+                    $driver,
+                    $extension
+                )
+            );
+        }
     }
 
 };

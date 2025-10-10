@@ -20,6 +20,19 @@ Asegúrate de que la base de datos definida en `.env` exista antes de correr las
 mysql -u root -p -e "CREATE DATABASE restaurante;"
 ```
 
+## 3.1. Verificar extensiones PDO
+Laravel necesita que la extensión PDO del motor que configuraste esté instalada en PHP. Comprueba qué driver usarás en `DB_CONNECTION` y habilita el módulo correspondiente:
+
+| Driver (`DB_CONNECTION`) | Extensión PHP | Ubuntu/Debian | macOS (Homebrew) |
+|--------------------------|---------------|---------------|------------------|
+| `mysql`                  | `pdo_mysql`   | `sudo apt install php-mysql` | `brew install php` *(incluye pdo_mysql)* |
+| `pgsql`                  | `pdo_pgsql`   | `sudo apt install php-pgsql` | `brew install php` *(incluye pdo_pgsql)* |
+| `sqlsrv`                 | `pdo_sqlsrv`  | [Extensiones Microsoft](https://learn.microsoft.com/sql/connect/php/installation-tutorial-linux-mac) | `pecl install sqlsrv pdo_sqlsrv` |
+| `sqlite`                 | `pdo_sqlite`  | `sudo apt install php-sqlite3` | `brew install php` *(incluye pdo_sqlite)* |
+
+Tras instalar la extensión, reinicia el servicio de PHP/FPM o tu terminal antes de volver a lanzar `php artisan migrate`.
+
+
 ## 4. Ejecutar las migraciones
 Con la base de datos lista, ejecuta:
 ```bash
