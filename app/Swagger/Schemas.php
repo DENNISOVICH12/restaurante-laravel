@@ -23,13 +23,10 @@ namespace App\Swagger;
  * @OA\Schema(
  *   schema="PedidoItemInput",
  *   type="object",
- *   required={"nombre_producto","precio","categoria","cantidad"},
- *   @OA\Property(property="nombre_producto", type="string", example="Limonada"),
- *   @OA\Property(property="precio", type="number", format="float", example=5500),
- *   @OA\Property(property="categoria", type="string", example="bebida"),
-
+ *   required={"menu_item_id","cantidad","precio"},
+ *   @OA\Property(property="menu_item_id", type="integer", example=12, description="ID del producto del menú"),
  *   @OA\Property(property="cantidad", type="integer", example=2),
- *   @OA\Property(property="descripcion", type="string", nullable=true, example="Sin azúcar")
+ *   @OA\Property(property="precio", type="number", format="float", example=5500, description="Precio unitario")
  * )
  */
 
@@ -38,12 +35,14 @@ namespace App\Swagger;
  *   schema="PedidoItem",
  *   type="object",
  *   @OA\Property(property="id", type="integer", example=101),
- *   @OA\Property(property="id_pedido", type="integer", example=25),
- *   @OA\Property(property="nombre_producto", type="string", example="Limonada"),
- *   @OA\Property(property="precio", type="number", format="float", example=5500),
- *   @OA\Property(property="categoria", type="string", example="bebida"),
+ *   @OA\Property(property="pedido_id", type="integer", example=25),
+ *   @OA\Property(property="restaurant_id", type="integer", example=1),
+ *   @OA\Property(property="menu_item_id", type="integer", example=12),
  *   @OA\Property(property="cantidad", type="integer", example=2),
- *   @OA\Property(property="descripcion", type="string", nullable=true, example="Sin azúcar")
+ *   @OA\Property(property="precio_unitario", type="number", format="float", example=5500),
+ *   @OA\Property(property="importe", type="number", format="float", example=11000),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
  * )
  */
 
@@ -54,8 +53,16 @@ namespace App\Swagger;
  *   required={"cliente_id","restaurant_id","estado"},
  *   @OA\Property(property="id", type="integer", example=25),
  *   @OA\Property(property="cliente_id", type="integer", example=7),
- *   @OA\Property(property="restaurant_id", type="integer", example=1),
+ *   @OA\Property(
+ *     property="restaurant_id",
+ *     type="integer",
+ *     example=1,
+ *     description="ID del restaurante. Si se omite, el sistema usa el enviado en el encabezado X-Restaurant-ID o el único restaurante registrado."
+ *   ),
+ *   @OA\Property(property="mesa", type="string", nullable=true, example="Mesa 4"),
  *   @OA\Property(property="estado", type="string", example="pendiente"),
+ *   @OA\Property(property="total", type="number", format="float", example=11000),
+ *   @OA\Property(property="fecha", type="string", example="2024-05-01 12:30"),
  *   @OA\Property(property="created_at", type="string", format="date-time", example="2024-05-01T12:30:00Z"),
  *   @OA\Property(property="updated_at", type="string", format="date-time", example="2024-05-01T12:35:00Z")
  * )
@@ -141,11 +148,18 @@ namespace App\Swagger;
  *   type="object",
  *   required={"cliente_id","restaurant_id","items"},
  *   @OA\Property(property="cliente_id", type="integer", example=7),
- *   @OA\Property(property="restaurant_id", type="integer", example=1),
+ *   @OA\Property(
+ *     property="restaurant_id",
+ *     type="integer",
+ *     example=1,
+ *     description="ID del restaurante. Puedes omitirlo si envías el encabezado X-Restaurant-ID o si solo existe un restaurante registrado."
+ *   ),
+ *   @OA\Property(property="mesa", type="string", nullable=true, example="Mesa 4"),
  *   @OA\Property(property="estado", type="string", example="pendiente"),
  *   @OA\Property(
  *     property="items",
  *     type="array",
+ *     example={{"menu_item_id":12,"cantidad":2,"precio":5500}},
  *     @OA\Items(ref="#/components/schemas/PedidoItemInput")
  *   )
  * )

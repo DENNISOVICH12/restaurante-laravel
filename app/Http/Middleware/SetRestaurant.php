@@ -33,12 +33,23 @@ class SetRestaurant
             }
         }
 
-        // Fallback en local: primer restaurante
-        if (!$restaurantId && app()->environment('local')) {
-            $restaurantId = Restaurant::value('id');
+        // Fallback automático cuando solo existe un restaurante registrado
+        if (!$restaurantId) {
+            $candidateIds = Restaurant::query()->limit(2)->pluck('id');
+
+            if ($candidateIds->count() === 1) {
+                $restaurantId = (int) $candidateIds->first();
+            } elseif (app()->environment(['local', 'testing']) && $candidateIds->isNotEmpty()) {
+                // En entornos locales o de pruebas usamos el primero disponible
+                $restaurantId = (int) $candidateIds->first();
+            }
         }
 
-        app()->instance('current_restaurant_id', $restaurantId);
+        if ($restaurantId !== null) {
+            app()->instance('current_restaurant_id', $restaurantId);
+        } else {
+            app()->forgetInstance('current_restaurant_id');
+        }
         $request->attributes->set('restaurant_id', $restaurantId);
 
         return $next($request);
