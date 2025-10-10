@@ -47,6 +47,63 @@ class PedidoApiTest extends TestCase
         $this->assertSame($ids['menu_item_id'], $response->json('data.detalle.0.menu_item_id'));
     }
 
+    public function test_can_create_pedido_without_header_when_single_restaurant_exists(): void
+    {
+        $restaurantId = DB::table('restaurants')->insertGetId([
+            'nombre' => 'Restaurante Único',
+            'slug' => 'restaurante-unico',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $clienteId = DB::table('clientes')->insertGetId([
+            'nombre_cliente' => 'Ana Torres',
+            'telefono' => '3009991122',
+            'direccion' => 'Calle 123',
+            'fecha_registro' => now(),
+        ]);
+
+        $menuItemId = DB::table('menu_items')->insertGetId([
+            'nombre' => 'Arepa Rellena',
+            'descripcion' => 'Con queso y hogao',
+            'categoria' => 'plato',
+            'precio' => 8000,
+            'imagen' => null,
+            'disponible' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->postJson('/api/pedidos', [
+            'cliente_id' => $clienteId,
+            'items' => [
+                ['menu_item_id' => $menuItemId, 'cantidad' => 2, 'precio' => 8000],
+            ],
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('message', 'Pedido creado')
+            ->assertJsonPath('data.restaurant_id', $restaurantId)
+            ->assertJsonPath('data.detalle.0.menu_item_id', $menuItemId)
+            ->assertJsonPath('data.detalle.0.cantidad', 2);
+
+        $pedidoId = $response->json('data.id');
+
+        $this->assertDatabaseHas('pedidos', [
+            'id' => $pedidoId,
+            'restaurant_id' => $restaurantId,
+            'cliente_id' => $clienteId,
+        ]);
+
+        $this->assertDatabaseHas('pedido_detalles', [
+            'pedido_id' => $pedidoId,
+            'menu_item_id' => $menuItemId,
+            'cantidad' => 2,
+            'precio_unitario' => '8000.00',
+            'importe' => '16000.00',
+        ]);
+    }
+
     private function seedPedidoConDetalle(): array
     {
         $restaurantId = DB::table('restaurants')->insertGetId([
