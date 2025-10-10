@@ -24,6 +24,13 @@ class PedidoController extends Controller
      *   operationId="PedidosIndex",
      *   summary="Lista de pedidos",
      *   tags={"Pedidos"},
+     *   @OA\Parameter(
+     *     name="X-Restaurant-ID",
+     *     in="header",
+     *     required=false,
+     *     description="ID numérico o slug del restaurante para filtrar el contexto",
+     *     @OA\Schema(type="string")
+     *   ),
      *   @OA\Response(
      *     response=200,
      *     description="Listado paginado",
@@ -65,6 +72,13 @@ class PedidoController extends Controller
      *   summary="Ver pedido por ID",
      *   tags={"Pedidos"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(
+     *     name="X-Restaurant-ID",
+     *     in="header",
+     *     required=false,
+     *     description="ID numérico o slug del restaurante para filtrar el contexto",
+     *     @OA\Schema(type="string")
+     *   ),
      *   @OA\Response(
      *     response=200,
      *     description="Pedido con detalle",
@@ -89,6 +103,13 @@ class PedidoController extends Controller
      *   path="/api/pedidos",
      *   summary="Crear pedido con items",
      *   tags={"Pedidos"},
+     *   @OA\Parameter(
+     *     name="X-Restaurant-ID",
+     *     in="header",
+     *     required=false,
+     *     description="ID numérico o slug del restaurante. Si no se envía y solo hay un restaurante, se usará automáticamente.",
+     *     @OA\Schema(type="string")
+     *   ),
      *   @OA\RequestBody(
      *     required=true,
      *     @OA\JsonContent(ref="#/components/schemas/PedidoCreateRequest")
@@ -145,6 +166,13 @@ class PedidoController extends Controller
      *   summary="Actualizar pedido (estado)",
      *   tags={"Pedidos"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(
+     *     name="X-Restaurant-ID",
+     *     in="header",
+     *     required=false,
+     *     description="ID numérico o slug del restaurante para el que se procesa el pedido",
+     *     @OA\Schema(type="string")
+     *   ),
      *   @OA\RequestBody(
      *     required=true,
      *     @OA\JsonContent(ref="#/components/schemas/PedidoUpdateRequest")
@@ -186,6 +214,13 @@ class PedidoController extends Controller
      *   summary="Eliminar pedido",
      *   tags={"Pedidos"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(
+     *     name="X-Restaurant-ID",
+     *     in="header",
+     *     required=false,
+     *     description="ID numérico o slug del restaurante para asegurar el contexto",
+     *     @OA\Schema(type="string")
+     *   ),
      *   @OA\Response(
      *     response=200,
      *     description="Eliminado",
@@ -216,6 +251,13 @@ class PedidoController extends Controller
      *   summary="Detalle del pedido",
      *   tags={"Pedidos - Detalle"},
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Parameter(
+     *     name="X-Restaurant-ID",
+     *     in="header",
+     *     required=false,
+     *     description="ID numérico o slug del restaurante",
+     *     @OA\Schema(type="string")
+     *   ),
      *   @OA\Response(
      *     response=200,
      *     description="Detalle listado",
