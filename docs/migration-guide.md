@@ -32,6 +32,7 @@ Laravel necesita que la extensión PDO del motor que configuraste esté instalad
 
 Tras instalar la extensión, reinicia el servicio de PHP/FPM o tu terminal antes de volver a lanzar `php artisan migrate`.
 
+
 ## 4. Ejecutar las migraciones
 Con la base de datos lista, ejecuta:
 ```bash
