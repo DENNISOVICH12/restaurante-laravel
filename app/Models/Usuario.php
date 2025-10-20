@@ -2,34 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable; // <—
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Usuario extends Authenticatable // <—
+class Usuario extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'usuarios';
 
     protected $fillable = [
-        'usuario', 'password', 'nombre', 'apellido', 'correo', 'rol', 'activo', 'restaurant_id',
+        'usuario',
+        'password',
+        'nombre',
+        'apellido',
+        'correo',
+        'activo',
+        'restaurant_id',
     ];
 
     protected $hidden = ['password', 'remember_token'];
 
-    protected $casts = ['activo' => 'boolean'];
-
-    // si tu login usa el campo "usuario", no "email"
-    public function getAuthIdentifierName()
-    {
-        return 'usuario';
-    }
-
-    // Hash automático del password
-    public function setPasswordAttribute($value)
-    {
-        if (!empty($value)) {
-            $this->attributes['password'] = bcrypt($value);
-        }
-    }
+    public $timestamps = true;
 }

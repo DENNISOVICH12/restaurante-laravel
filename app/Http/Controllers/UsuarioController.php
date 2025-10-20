@@ -34,10 +34,10 @@ class UsuarioController extends Controller
      * @OA\Get(
      *   path="/api/usuarios/{id}",
      *   tags={"Usuarios"},
-     *   summary="Ver usuario",
+     *   summary="Ver usuario por ID",
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/Usuario")),
-     *   @OA\Response(response=404, description="No encontrado")
+     *   @OA\Response(response=404, description="Usuario no encontrado")
      * )
      */
     public function show($id)
@@ -49,7 +49,7 @@ class UsuarioController extends Controller
      * @OA\Post(
      *   path="/api/usuarios",
      *   tags={"Usuarios"},
-     *   summary="Crear usuario",
+     *   summary="Crear un nuevo usuario",
      *   @OA\RequestBody(required=true,
      *     @OA\JsonContent(
      *       required={"usuario","password","nombre","correo","rol"},
@@ -59,45 +59,41 @@ class UsuarioController extends Controller
      *       @OA\Property(property="apellido", type="string", nullable=true, example="Demo"),
      *       @OA\Property(property="correo", type="string", format="email", example="admin@example.com"),
      *       @OA\Property(property="rol", type="string", example="admin",
-     *         description="admin|gerente|cajero|mozo|cocinero|empleado"),
+     *         description="admin|mesero|cocinero|cliente|empleado"),
      *       @OA\Property(property="activo", type="boolean", example=true),
      *       @OA\Property(property="restaurant_id", type="integer", example=1)
      *     )
      *   ),
-     *   @OA\Response(response=201, description="Creado", @OA\JsonContent(ref="#/components/schemas/Usuario")),
+     *   @OA\Response(response=201, description="Usuario creado", @OA\JsonContent(ref="#/components/schemas/Usuario")),
      *   @OA\Response(response=422, description="Validación fallida")
      * )
      */
     public function store(Request $request)
-{
-    $data = $request->validate([
-        'usuario'       => ['required','string','max:50','unique:usuarios,usuario'],
-        'password'      => ['required','string','min:6'],
-        'nombre'        => ['required','string','max:120'],
-        'apellido'      => ['nullable','string','max:120'],
-        'correo'        => ['required','email','max:180','unique:usuarios,correo'],
-        'rol'           => ['required','in:admin,mesero,cocinero,cliente,empleado'],
-        'activo'        => ['boolean'],
-        // ⚠️ si tienes FK a restaurants(id):
-        'restaurant_id' => ['nullable','integer','exists:restaurants,id'],
-    ]);
+    {
+        $data = $request->validate([
+            'usuario'       => ['required','string','max:50','unique:usuarios,usuario'],
+            'password'      => ['required','string','min:6'],
+            'nombre'        => ['required','string','max:120'],
+            'apellido'      => ['nullable','string','max:120'],
+            'correo'        => ['required','email','max:180','unique:usuarios,correo'],
+            'rol'           => ['required','in:admin,mesero,cocinero,cliente,empleado'],
+            'activo'        => ['boolean'],
+            'restaurant_id' => ['nullable','integer','exists:restaurants,id'],
+        ]);
 
-    // defaults seguros
-    $data['activo'] = $data['activo'] ?? true;
-    // si no envían restaurant_id, usa 1 (asegúrate que exista!)
-    $data['restaurant_id'] = $data['restaurant_id'] ?? 1;
+        $data['activo'] = $data['activo'] ?? true;
+        $data['restaurant_id'] = $data['restaurant_id'] ?? 1;
 
-    // NO vuelvas a hacer bcrypt aquí: el mutator del modelo ya hashea
-    $usuario = Usuario::create($data);
+        $usuario = Usuario::create($data);
 
-    return response()->json($usuario, 201);
-}
+        return response()->json($usuario, 201);
+    }
 
     /**
      * @OA\Put(
      *   path="/api/usuarios/{id}",
      *   tags={"Usuarios"},
-     *   summary="Actualizar usuario",
+     *   summary="Actualizar usuario existente",
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *   @OA\RequestBody(required=true,
      *     @OA\JsonContent(
@@ -111,8 +107,8 @@ class UsuarioController extends Controller
      *       @OA\Property(property="restaurant_id", type="integer", example=1)
      *     )
      *   ),
-     *   @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/Usuario")),
-     *   @OA\Response(response=404, description="No encontrado"),
+     *   @OA\Response(response=200, description="Usuario actualizado", @OA\JsonContent(ref="#/components/schemas/Usuario")),
+     *   @OA\Response(response=404, description="Usuario no encontrado"),
      *   @OA\Response(response=422, description="Validación fallida")
      * )
      */
@@ -131,9 +127,7 @@ class UsuarioController extends Controller
             'restaurant_id' => ['sometimes','integer'],
         ]);
 
-        // Al asignar "password" plano, el mutator lo hashea
         $u->update($data);
-
         return response()->json($u);
     }
 
@@ -143,8 +137,8 @@ class UsuarioController extends Controller
      *   tags={"Usuarios"},
      *   summary="Eliminar usuario",
      *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *   @OA\Response(response=200, description="Eliminado"),
-     *   @OA\Response(response=404, description="No encontrado")
+     *   @OA\Response(response=200, description="Usuario eliminado"),
+     *   @OA\Response(response=404, description="Usuario no encontrado")
      * )
      */
     public function destroy($id)

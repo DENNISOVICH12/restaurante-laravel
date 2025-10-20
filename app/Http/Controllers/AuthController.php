@@ -3,81 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function login(Request $request)
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            if (!$user instanceof \App\Models\Usuario) {
-                Auth::logout();
-                return redirect()->route('login')->withErrors(['usuario' => 'Usuario no válido.']);
-            }
-            return $this->redirectForRole($user);
-        }
-
-        return view('auth.login');
-    }
-
-    public function doLogin(Request $request)
-    {
-        $cred = $request->validate([
-            'usuario'  => ['required', 'string'],
-            'password' => ['required', 'string'],
+        $credentials = $request->validate([
+            'usuario' => 'required|string',
+            'password' => 'required|string',
         ]);
 
-        $login = trim($cred['usuario']);
-        $remember = $request->boolean('remember');
+        $user = Usuario::where('usuario', $credentials['usuario'])->first();
 
-        $attempted = $this->attemptLogin(['usuario' => $login, 'password' => $cred['password']], $remember);
-
-        if (!$attempted && filter_var($login, FILTER_VALIDATE_EMAIL)) {
-            $attempted = $this->attemptLogin(['correo' => $login, 'password' => $cred['password']], $remember);
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return response()->json(['error' => 'Credenciales incorrectas'], 401);
         }
 
-        if (!$attempted) {
-            return back()->withErrors([
-                'usuario' => 'Las credenciales proporcionadas no son válidas.',
-            ])->withInput();
-        }
+        $token = $user->createToken('api_token', [$user->rol])->plainTextToken;
 
-        $request->session()->regenerate();
-
-        $user = Auth::user();
-        if (!$user instanceof \App\Models\Usuario) {
-            Auth::logout();
-            return redirect()->route('login')->withErrors(['usuario' => 'Usuario no válido.']);
-        }
-        return $this->redirectForRole($user);
+        return response()->json([
+            'message' => 'Inicio de sesión exitoso',
+            'token' => $token,
+            'rol' => $user->rol,
+        ]);
     }
-
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect()->route('login');
-    }
-
-    protected function attemptLogin(array $credentials, bool $remember = false): bool
-    {
-        $credentials['activo'] = true;
-
-        return Auth::attempt($credentials, $remember);
-    }
-
-    protected function redirectForRole(Usuario $user)
-    {
-        return match (strtolower($user->rol)) {
-            'admin'    => redirect()->route('admin.panel'),
-            'cocinero' => redirect()->route('cocina.panel'),
-            'mesero'   => redirect()->route('meseros.panel'),
-            'cliente'  => redirect()->route('cliente.panel'),
-            default    => redirect()->route('cliente.panel'),
-        };
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Sesión cerrada correctamente']);
     }
 }

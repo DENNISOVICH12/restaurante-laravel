@@ -49,6 +49,6 @@ class Pedido extends Model
 
     public function getFechaAttribute(): ?string
     {
-        return $this->created_at ? $this->created_at->format('Y-m-d H:i') : null;
+        return $this->created_at ? $this->created_at->format('Y-m-d') : null;
     }
 }

@@ -18,10 +18,13 @@ class Cliente extends Model
      * Campos que se pueden asignar masivamente.
      */
     protected $fillable = [
-        'nombre',
-        'email',
-        'restaurant_id',
+        'nombre_cliente',
+        'telefono',
+        'direccion',
+        'fecha_registro'
     ];
+        public $timestamps = false;
+
 
     /**
      * Relación con el restaurante.
@@ -39,5 +42,6 @@ class Cliente extends Model
     public function pedidos()
     {
         return $this->hasMany(Pedido::class, 'cliente_id');
+        return $this->hasMany(\App\Models\Pedido::class);
     }
 }

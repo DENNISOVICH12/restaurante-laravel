@@ -271,55 +271,7 @@
                 "operationId": "f8f6266a0f281d4a6fd2924521990d27",
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "nombre": {
-                                                        "type": "string",
-                                                        "example": "Limonada"
-                                                    },
-                                                    "descripcion": {
-                                                        "type": "string",
-                                                        "example": "Natural",
-                                                        "nullable": true
-                                                    },
-                                                    "categoria": {
-                                                        "type": "string",
-                                                        "example": "bebida"
-                                                    },
-                                                    "precio": {
-                                                        "type": "number",
-                                                        "format": "float",
-                                                        "example": 6.5
-                                                    },
-                                                    "imagen": {
-                                                        "type": "string",
-                                                        "example": "limonada.jpg",
-                                                        "nullable": true
-                                                    },
-                                                    "disponible": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "OK"
                     }
                 }
             },
@@ -366,6 +318,10 @@
                                     "disponible": {
                                         "type": "boolean",
                                         "example": true
+                                    },
+                                    "restaurant_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -376,6 +332,80 @@
                 "responses": {
                     "201": {
                         "description": "Creado"
+                    },
+                    "422": {
+                        "description": "Validación fallida"
+                    }
+                }
+            }
+        },
+        "/api/menu-items/bulk": {
+            "post": {
+                "tags": [
+                    "Menu Items"
+                ],
+                "summary": "Crear múltiples ítems del menú (bulk)",
+                "description": "Crear varios ítems enviando un objeto con la propiedad 'items' (array de objetos).",
+                "operationId": "a224958eb73bea79a87d49f45da344bd",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "nombre",
+                                                "categoria",
+                                                "precio"
+                                            ],
+                                            "properties": {
+                                                "nombre": {
+                                                    "type": "string",
+                                                    "example": "Limonada"
+                                                },
+                                                "descripcion": {
+                                                    "type": "string",
+                                                    "example": "Natural",
+                                                    "nullable": true
+                                                },
+                                                "categoria": {
+                                                    "type": "string",
+                                                    "example": "bebida"
+                                                },
+                                                "precio": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 6.5
+                                                },
+                                                "imagen": {
+                                                    "type": "string",
+                                                    "example": "limonada.jpg",
+                                                    "nullable": true
+                                                },
+                                                "disponible": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "restaurant_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Ítems creados correctamente"
                     },
                     "422": {
                         "description": "Validación fallida"
@@ -457,6 +487,10 @@
                                     "disponible": {
                                         "type": "boolean",
                                         "example": false
+                                    },
+                                    "restaurant_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -507,11 +541,11 @@
                 "tags": [
                     "Pedidos"
                 ],
-                "summary": "Lista de pedidos",
-                "operationId": "PedidosIndex",
+                "summary": "Listar todos los pedidos",
+                "operationId": "9368500233e75a120cb606e08d7a06e4",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Lista de pedidos"
                     }
                 }
             },
@@ -519,7 +553,7 @@
                 "tags": [
                     "Pedidos"
                 ],
-                "summary": "Crear pedido con items",
+                "summary": "Registrar un nuevo pedido",
                 "operationId": "acf9c44ffbceb280fd290ecbb5f5f3f3",
                 "requestBody": {
                     "required": true,
@@ -528,60 +562,27 @@
                             "schema": {
                                 "required": [
                                     "cliente_id",
-                                    "restaurant_id",
-                                    "items"
+                                    "menu_item_id",
+                                    "cantidad",
+                                    "total"
                                 ],
                                 "properties": {
                                     "cliente_id": {
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "restaurant_id": {
+                                    "menu_item_id": {
                                         "type": "integer",
-                                        "example": 1
+                                        "example": 2
                                     },
-                                    "mesa": {
-                                        "type": "string",
-                                        "example": "A3"
+                                    "cantidad": {
+                                        "type": "integer",
+                                        "example": 3
                                     },
-                                    "estado": {
-                                        "type": "string",
-                                        "example": "pendiente"
-                                    },
-                                    "items": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "nombre_producto",
-                                                "precio",
-                                                "categoria",
-                                                "cantidad"
-                                            ],
-                                            "properties": {
-                                                "nombre_producto": {
-                                                    "type": "string",
-                                                    "example": "Limonada"
-                                                },
-                                                "precio": {
-                                                    "type": "number",
-                                                    "format": "float",
-                                                    "example": 5.5
-                                                },
-                                                "categoria": {
-                                                    "type": "string",
-                                                    "example": "bebida"
-                                                },
-                                                "cantidad": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                },
-                                                "descripcion": {
-                                                    "type": "string",
-                                                    "example": "sin azúcar"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
+                                    "total": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 45000
                                     }
                                 },
                                 "type": "object"
@@ -591,10 +592,10 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Creado"
+                        "description": "Pedido creado exitosamente"
                     },
-                    "422": {
-                        "description": "Datos inválidos"
+                    "400": {
+                        "description": "Error de validación"
                     }
                 }
             }
@@ -604,8 +605,8 @@
                 "tags": [
                     "Pedidos"
                 ],
-                "summary": "Ver pedido por ID",
-                "operationId": "PedidosShow",
+                "summary": "Mostrar un pedido por ID",
+                "operationId": "69873c1dd29645d07e53a4c4db9057e9",
                 "parameters": [
                     {
                         "name": "id",
@@ -618,10 +619,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Pedido encontrado"
                     },
                     "404": {
-                        "description": "No encontrado"
+                        "description": "Pedido no encontrado"
                     }
                 }
             },
@@ -629,7 +630,7 @@
                 "tags": [
                     "Pedidos"
                 ],
-                "summary": "Actualizar pedido (mesa/estado)",
+                "summary": "Actualizar un pedido existente",
                 "operationId": "3da8de6967b1e89d1d5a0cf5988c04e5",
                 "parameters": [
                     {
@@ -642,22 +643,27 @@
                     }
                 ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "mesa": {
-                                        "type": "string"
+                                    "cliente_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
-                                    "estado": {
-                                        "type": "string",
-                                        "enum": [
-                                            "pendiente",
-                                            "en_entrega",
-                                            "listo",
-                                            "entregado",
-                                            "cancelado"
-                                        ]
+                                    "menu_item_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "cantidad": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "total": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 45000
                                     }
                                 },
                                 "type": "object"
@@ -667,13 +673,10 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Pedido actualizado correctamente"
                     },
                     "404": {
-                        "description": "No encontrado"
-                    },
-                    "422": {
-                        "description": "Datos inválidos"
+                        "description": "Pedido no encontrado"
                     }
                 }
             },
@@ -681,7 +684,7 @@
                 "tags": [
                     "Pedidos"
                 ],
-                "summary": "Eliminar pedido",
+                "summary": "Eliminar un pedido",
                 "operationId": "c0cc39e3f79740c3fe58d2268a321d0b",
                 "parameters": [
                     {
@@ -695,37 +698,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Eliminado"
+                        "description": "Pedido eliminado correctamente"
                     },
                     "404": {
-                        "description": "No encontrado"
-                    }
-                }
-            }
-        },
-        "/api/pedidos/{id}/detalle": {
-            "get": {
-                "tags": [
-                    "Pedidos - Detalle"
-                ],
-                "summary": "Detalle del pedido",
-                "operationId": "b5decb9dd04d9964b0fe67a51601d794",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "No encontrado"
+                        "description": "Pedido no encontrado"
                     }
                 }
             }
@@ -785,7 +761,7 @@
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Crear usuario",
+                "summary": "Crear un nuevo usuario",
                 "operationId": "4e9dbcbdaaaf9faab196a82d5cbaea23",
                 "requestBody": {
                     "required": true,
@@ -823,7 +799,7 @@
                                         "example": "admin@example.com"
                                     },
                                     "rol": {
-                                        "description": "admin|gerente|cajero|mozo|cocinero|empleado",
+                                        "description": "admin|mesero|cocinero|cliente|empleado",
                                         "type": "string",
                                         "example": "admin"
                                     },
@@ -843,7 +819,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Creado",
+                        "description": "Usuario creado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -863,7 +839,7 @@
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Ver usuario",
+                "summary": "Ver usuario por ID",
                 "operationId": "e9ac05ddc4ea46d8848b012d7d92e3ac",
                 "parameters": [
                     {
@@ -887,7 +863,7 @@
                         }
                     },
                     "404": {
-                        "description": "No encontrado"
+                        "description": "Usuario no encontrado"
                     }
                 }
             },
@@ -895,7 +871,7 @@
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Actualizar usuario",
+                "summary": "Actualizar usuario existente",
                 "operationId": "27ac608b6dd8b8e7c7c45b10c5210b3e",
                 "parameters": [
                     {
@@ -955,7 +931,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Usuario actualizado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -965,7 +941,7 @@
                         }
                     },
                     "404": {
-                        "description": "No encontrado"
+                        "description": "Usuario no encontrado"
                     },
                     "422": {
                         "description": "Validación fallida"
@@ -990,10 +966,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Eliminado"
+                        "description": "Usuario eliminado"
                     },
                     "404": {
-                        "description": "No encontrado"
+                        "description": "Usuario no encontrado"
                     }
                 }
             }
@@ -1002,11 +978,14 @@
     "components": {
         "schemas": {
             "Usuario": {
+                "title": "Usuario",
+                "description": "Modelo que representa un usuario del sistema",
                 "required": [
                     "usuario",
                     "password",
                     "nombre",
-                    "correo"
+                    "correo",
+                    "rol"
                 ],
                 "properties": {
                     "id": {
@@ -1017,17 +996,13 @@
                         "type": "string",
                         "example": "admin"
                     },
-                    "password": {
-                        "type": "string",
-                        "example": "secreto123"
-                    },
                     "nombre": {
                         "type": "string",
-                        "example": "Admin"
+                        "example": "Administrador"
                     },
                     "apellido": {
                         "type": "string",
-                        "example": "Demo",
+                        "example": "Pérez",
                         "nullable": true
                     },
                     "correo": {
@@ -1035,17 +1010,45 @@
                         "format": "email",
                         "example": "admin@example.com"
                     },
+                    "rol": {
+                        "type": "string",
+                        "example": "admin"
+                    },
                     "activo": {
                         "type": "boolean",
                         "example": true
                     },
+                    "restaurant_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
                     "created_at": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "example": "2025-10-12T15:00:00Z"
                     },
                     "updated_at": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "example": "2025-10-12T15:30:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ApiErrorResponse": {
+                "properties": {
+                    "error": {
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 404
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "No encontrado"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -1053,6 +1056,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Pedidos",
+            "description": "Gestión de pedidos del restaurante"
+        },
         {
             "name": "Usuarios",
             "description": "CRUD de usuarios"
@@ -1076,14 +1083,6 @@
         {
             "name": "Health",
             "description": "Health"
-        },
-        {
-            "name": "Pedidos",
-            "description": "Pedidos"
-        },
-        {
-            "name": "Pedidos - Detalle",
-            "description": "Pedidos - Detalle"
         },
         {
             "name": "Platos (tabla)",

@@ -25,7 +25,7 @@ return new class extends Migration {
                   ->constrained('menu_items')->nullOnDelete();
 
             // Campos del detalle
-            $table->integer('cantidad')->default(1);
+            $table->integer('cantidad');
             $table->decimal('precio_unitario', 10, 2);
             $table->decimal('importe', 10, 2);
 

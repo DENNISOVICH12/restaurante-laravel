@@ -12,13 +12,14 @@ class DetallePedido extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'pedido_id',
-        'restaurant_id',
         'menu_item_id',
         'cantidad',
         'precio_unitario',
         'importe',
+        'restaurant_id',
+        'pedido_id',
     ];
+    
 
     public function pedido()
     {

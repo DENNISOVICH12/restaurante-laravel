@@ -1,62 +1,88 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HealthController;
-use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\MenuItemController;
-use App\Http\Controllers\PedidoController;
-use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\MenuController;
-use App\Http\Controllers\Auth\ApiLoginController;
+use App\Http\Controllers\{
+    HealthController,
+    ClienteController,
+    MenuItemController,
+    PedidoController,
+    UsuarioController,
+    MenuController,
+    Auth\ApiLoginController,
+    PlatoTableController,
+    BebidaTableController
+};
 
+/*
+|--------------------------------------------------------------------------
+| Rutas Públicas (sin autenticación)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/ping', [HealthController::class, 'ping']);
 
-// Clientes
-Route::get('/clientes', [ClienteController::class, 'index']);
-Route::get('/clientes/{id}', [ClienteController::class, 'show']);
-Route::post('/clientes', [ClienteController::class, 'store']);
-Route::put('/clientes/{id}', [ClienteController::class, 'update']);
-Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
-Route::apiResource('clientes', ClienteController::class);
-
-// Menú-Items
-Route::get('/menu-items', [MenuItemController::class, 'index']);
-Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
-Route::post('/menu-items', [MenuItemController::class, 'store']);
-Route::put('/menu-items/{id}', [MenuItemController::class, 'update']);
-Route::delete('/menu-items/{id}', [MenuItemController::class, 'destroy']);
-Route::post('/menu-items/bulk', [MenuItemController::class, 'storeBulk']);
-
-
-// Menú
-Route::get('/menu/today', [MenuController::class, 'showToday']);
-// usuarios
-Route::apiResource('usuarios', UsuarioController::class);
-
-
-// Pedidos
-Route::get('/pedidos', [PedidoController::class, 'index']);
-Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
-Route::post('/pedidos', [PedidoController::class, 'store']);
-Route::put('/pedidos/{id}', [PedidoController::class, 'update']);
-Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy']);
-Route::put   ('pedidos/{id}',        [PedidoController::class, 'update']);
-Route::delete('pedidos/{id}',        [PedidoController::class, 'destroy']);
-Route::get   ('pedidos/{id}/detalle',[PedidoController::class, 'detalle']);
-
-// Detalle (lectura; crear/editar/eliminar se haría en otra iteración si quieres)
-Route::get('/pedidos/{id}/detalle', [PedidoController::class, 'detalle']);
-Route::apiResource('usuarios', UsuarioController::class);
+// 🔐 Login público
 Route::post('login', [ApiLoginController::class, 'login']);
-Route::post('logout', [ApiLoginController::class, 'logout'])->middleware('auth:sanctum');
-use App\Http\Controllers\PlatoTableController;
-use App\Http\Controllers\BebidaTableController;
 
+// Menú público del día
+Route::get('/menu/today', [MenuController::class, 'showToday']);
+
+// Recursos de solo lectura públicos (si lo deseas)
 Route::get('platos-fisicos', [PlatoTableController::class, 'index']);
 Route::get('bebidas-fisicas', [BebidaTableController::class, 'index']);
-Route::middleware(['auth:sanctum','role:admin'])->group(function () {
-    Route::get('admin/dashboard', fn() => response()->json(['ok'=>true]));
+
+/*
+|--------------------------------------------------------------------------
+| Rutas Protegidas (requieren token Sanctum)
+|--------------------------------------------------------------------------
+*/
+Route::middleware([])->group(function () {
+
+    // --- Logout ---
+    Route::post('logout', [\App\Http\Controllers\Auth\ApiLoginController::class, 'logout'])->middleware('auth:sanctum');
+    /*
+    |--------------------------------------------------------------------------
+    | CLIENTES
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/clientes', [ClienteController::class, 'index']);
+    Route::get('/clientes/{id}', [ClienteController::class, 'show']);
+    Route::post('/clientes', [ClienteController::class, 'store']);
+    Route::put('/clientes/{id}', [ClienteController::class, 'update']);
+    Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | MENU ITEMS
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/menu-items', [MenuItemController::class, 'store']);
+    Route::get('/menu-items', [MenuItemController::class, 'index']);
+    Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
+    Route::post('/menu-items', [MenuItemController::class, 'store'])->middleware('can:admin');
+    Route::put('/menu-items/{id}', [MenuItemController::class, 'update'])->middleware('can:admin');
+    Route::delete('/menu-items/{id}', [MenuItemController::class, 'destroy'])->middleware('can:admin');
+    Route::post('/menu-items/bulk', [MenuItemController::class, 'storeBulk'])->middleware('can:admin');
+
+    /*
+    |--------------------------------------------------------------------------
+    | PEDIDOS
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/pedidos', [PedidoController::class, 'index']);
+    Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
+    Route::post('/pedidos', [PedidoController::class, 'store']);
+    Route::put('/pedidos/{id}', [PedidoController::class, 'update']);
+    Route::delete('/pedidos/{id}', [PedidoController::class, 'destroy']);
+    Route::get('/pedidos/{id}/detalle', [PedidoController::class, 'detalle']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | USUARIOS (Solo administradores)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('can:admin')->group(function () {
+        Route::apiResource('usuarios', UsuarioController::class);
+        Route::get('admin/dashboard', fn() => response()->json(['ok' => true, 'message' => 'Panel de administración']));
+    });
 });
-
-
