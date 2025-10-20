@@ -8,14 +8,25 @@ trait BelongsToRestaurant
     public static function bootBelongsToRestaurant()
     {
         static::addGlobalScope('restaurant', function (Builder $builder) {
-            if ($rid = app('current_restaurant_id')) {
-                $builder->where($builder->getModel()->getTable().'.restaurant_id', $rid);
+            if (app()->bound('current_restaurant_id')) {
+                $rid = app('current_restaurant_id');
+
+                if ($rid !== null) {
+                    $builder->where(
+                        $builder->getModel()->getTable() . '.restaurant_id',
+                        $rid
+                    );
+                }
             }
         });
 
         static::creating(function ($model) {
-            if ($rid = app('current_restaurant_id')) {
-                $model->restaurant_id = $rid;
+            if (app()->bound('current_restaurant_id')) {
+                $rid = app('current_restaurant_id');
+
+                if ($rid !== null) {
+                    $model->restaurant_id = $rid;
+                }
             }
         });
     }
