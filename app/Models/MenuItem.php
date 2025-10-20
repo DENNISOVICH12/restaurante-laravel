@@ -13,7 +13,13 @@ class MenuItem extends Model
     protected $table = 'menu_items'; // cambia si tu tabla se llama distinto
 
     protected $fillable = [
-        'nombre', 'descripcion', 'categoria', 'precio', 'imagen', 'disponible',
+        'nombre',
+        'descripcion',
+        'categoria',
+        'precio',
+        'imagen',
+        'disponible',
+        'restaurant_id',
     ];
 
     protected $casts = [
